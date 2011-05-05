@@ -47,7 +47,7 @@ connect(Server) ->
 	
 	Answer == pong -> global:whereis_name(mainServer_PID),
 			  spawn(Server,client_handler,init,[]);
-			  %register(clientHandler, spawn(Server,client_handler,init,[])),
+			  %%register(clientHandler, spawn(Server,client_handler,init,[])),
 			 
 	true -> io:format("Connection ERROR~n",[])
 		

@@ -1,34 +1,49 @@
-%% @author Simon Young, Tobias.
-%% @doc The server that handles all the traffic between clients and also stores information
-%% about there status. The server also enables clients to play games against eachother.
-
 -module(server).
--export([init/0,server/1,checkAlias/3]).
+-export([init/0,server/0,checkAlias/2, runtest/0]).
+-include_lib("eunit/include/eunit.hrl").
 
-server(ClientTable) ->
-    io:format("Server pid~w~n", [self()]),
-    io:format("ClientTable~w~n", [ClientTable]),
-    receive
-	{status,Pid,Alias,Status} -> ets:insert(ClientTable, {Pid,Alias,Status});			      
-	{checkAlias,Pid,Alias} -> spawn(server,checkAlias,[Pid,Alias,ClientTable])		       	      			 
-    end,
-    server(ClientTable).
-
-%% @doc starts up the server.
 init() ->
-    ClientTable = ets:new(clientTable,[set]),
-ets:insert(ClientTable, {self(),"youngen",[main]}),
-    global:register_name(mainServer_PID,spawn(server,server,[ClientTable])).
+    ets:new(clientTable, [set, public, named_table]),
+%--------Debug---------------------
+%	ets:insert(ClientTable, {self(), "foo", [main]}),
+%	io:format("ETS: ~w~n", [ets:info(clientTable)]),
+%----------------------------------
+	global:register_name(mainServer_PID, spawn(server, server, [])).
 
-%% @doc Checks if the Alias is already in use.
-checkAlias(Pid,Alias,ClientTable) ->
-    Answer = ets:match(ClientTable,{'$1',Alias,'_'}),
+server() ->
+    io:format("Server pid: ~w~n", [self()]),
+
+% works in init, but fails in server
+%------Debug------------------------
+%	ets:match(clientTable, {'$1', "foo", '_'}),
+%	ets:insert(clientTable, {self(), "youngen", [main]}),
+%-----------------------------------
+	receive
+		{status, Pid, Alias, Status} ->  
+			ets:insert(clientTable, {Pid, Alias, Status});
+		{checkAlias, Pid, Alias} -> 
+			spawn(server, checkAlias, [Pid, Alias])		       	      
+    end,
+    server().
+
+checkAlias(Pid, Alias) ->
+    Answer = ets:match(clientTable, {'$1', Alias, '_'}),
     if
-	Answer == [] -> Pid ! aliasTrue;
-	true -> Pid ! aliasFalse
+		Answer == [] -> 
+			Pid ! aliasTrue;
+		true -> 
+			Pid ! aliasFalse
     end.
-	    
-    
-    
-	
+
+% Test cases
+
+runtest() ->
+	test(),
+	init:stop().
+checkAlias_test() ->
+	ets:new(clientTable, [set, public, named_table]),
+	checkAlias(self(), "foo"),
+	ets:insert(clientTable, {self(), "foo", [main]}),
+	checkAlias(self(), "foo"),
+	checkAlias(self(), "bar").
 
