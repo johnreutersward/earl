@@ -1,4 +1,3 @@
-
 CC = erlc -W
 ERL = erl -noshell -s
 ERL_SRV = erl -sname server -setcookie earl_game_club -s server init
@@ -30,7 +29,7 @@ server.beam:	server.erl
 	$(CC) $<
     
 complete:
-    $(CC) $(ERLC_COMPLETE) $(SRC_DIR)/*.erl
+        $(CC) $(ERLC_COMPLETE) $(SRC_DIR)/*.erl
 
 clean:
 	rm -f *.beam
