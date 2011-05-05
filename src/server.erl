@@ -15,10 +15,12 @@ server() ->
 %	ets:insert(clientTable, {self(), "youngen", [main]}),
 %-----------------------------------
 	receive
-		{setStatus, Pid, Alias, Status} ->  
-			db ! {client,setStatus,Pid,Alias,Status};
-		{checkAlias, Pid, Alias} -> 
-			db ! {checkAlias,Pid,Alias}	       	      
+	    {setStatus, Pid, Alias, Status} ->  
+		db ! {client,setStatus,Pid,Alias,Status};
+	    {checkAlias, Pid, Alias} -> 
+		db ! {checkAlias,Pid,Alias};	       	      
+	    {quit,Pid} ->
+		db ! {remove,Pid}
     end,
     server().
 

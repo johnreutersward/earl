@@ -5,14 +5,15 @@
 
 -module(client).
 -export([connect/1,say/1,challange/1,quit/0, runtest/0]).
--export([start/0]).
+-export([init/0]).
 
 -include_lib("eunit/include/eunit.hrl").
 
 client() ->
     Command = io:get_line("> "),
     Command2 = string:strip(Command, both, $\n),
-    command(string:tokens(Command2, " ")).
+    command(string:tokens(Command2, " ")),
+    client().
 
 %% @doc this function parses String into difrent commands.
 
@@ -27,8 +28,7 @@ command([Command | Input]) ->
 	"quit" -> 
 	    quit();
 	true -> io:format("Unknown command~n",[])
-    end,
-    client().
+    end.
 
 %% @doc Starts the client.
 %% @spec start() -> client
@@ -43,34 +43,28 @@ connect(Server) ->
     Answer = net_adm:ping(Server),
     if
 	
-	Answer == pong -> global:whereis_name(mainServer_PID),
-			  spawn(Server,client_handler,init,[]),
-			  %register(clientHandler, spawn(Server,client_handler,init,[])),
-			 client();
-	true -> io:format("Connection ERROR~n",[]),
-		client()
+	Answer == pong -> spawn(Server,client_handler,init,[]);	 
+	true -> io:format("Connection ERROR~n",[])
+		
     end.
 
 %% @doc sends a message to the server
 %% @spec say() -> {say,Msg}
 
 say(Msg) ->
-    clientHandler ! {say,Msg},
-    client().
+    clientHandler ! {say,Msg}.
 
 %% @doc sends a challange to another user
 %% @spec challange() -> {challange,User}
 	     
 challange(User) ->
-    clientHandler ! {challange,User},
-    client().
+    clientHandler ! {challange,User}.
 
 %% @doc log off the server.
 %% @spec quit() -> {quit}
 	     
 quit() ->
-    clientHandler ! {quit},
-    client().
+    clientHandler ! {quit}.
 
 
 %% TEST CASES %%

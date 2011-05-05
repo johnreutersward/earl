@@ -16,9 +16,9 @@ database() ->
 	{client,setStatus, Pid, Alias, Status} ->
 	    ets:insert(clientTable,{Pid,Alias,Status});
 	{checkAlias,Origin,Alias} ->
-	    checkAlias(Origin,Alias)
-	    
-	    
+	    checkAlias(Origin,Alias);
+	{remove,Pid} ->
+	    ets:delete(clientTable,Pid)	    	    
     end,
     database().
 

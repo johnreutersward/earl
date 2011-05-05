@@ -1,6 +1,6 @@
 
 -module(client_handler).
--export([handle_client/0, init/0, runtest/0]).
+-export([handle_client/2, init/0, runtest/0]).
 -include_lib("eunit/include/eunit.hrl").
 
 init() ->
@@ -13,23 +13,23 @@ create_alias() ->
 	Alias = string:strip(Alias1, both, $\n),
     theServer ! {checkAlias,self(),Alias},
     receive
-		aliasTrue -> 
-			theServer ! {setStatus, self(), Alias, [main]},
-		    handle_client();
+	aliasTrue -> 
+	    theServer ! {setStatus, self(), Alias, [main]},
+	    handle_client(Alias,[main]);
         aliasFalse -> 
-			io:format("Alias is already in use, please choose another Alias~n", []),
-		    create_alias()
+	    io:format("Alias is already in use, please choose another Alias~n", []),
+	    create_alias()
     end.
 
-handle_client() ->
+handle_client(Alias,Status) ->
     receive		      
 		{say,Msg} -> 
 			theServer ! {say, Msg, self()},
-		    handle_client();
+		    handle_client(Alias,Status);
 		{challange, User} -> 
 			theServer ! {challange, User, self()},
-			wait_challangeaccept(User), %% waits for challanger to accept or decline
-			handle_client();
+			wait_challangeaccept(User,Alias,Status), %% waits for challanger to accept or decline
+			handle_client(Alias,Status);
 		{challanged,User} -> 
 			io:format("~w has challenged you to a game, do you acceppt? (y/n)", [User]),
 			Answer = io:get_line(" "),
@@ -37,12 +37,12 @@ handle_client() ->
 			gamemode();
 		{quit} -> 
 			theServer ! {quit, self()},
-			ok
+			io:format("You are disconnected~n",[])
     end.
 	
 %% HELP FUNCTIONS %%
 
-wait_challangeaccept(User) ->
+wait_challangeaccept(User,Alias,Status) ->
      receive
 		{answer, Answer} -> 
 			if
@@ -51,7 +51,7 @@ wait_challangeaccept(User) ->
 				 Answer == y -> 
 					 gamemode(); %% enters game mode
 				 true -> 
-					 handle_client()    
+					 handle_client(Alias,Status)    
 			end
      after 60000 -> 
 		io:format("~w Declines your challange~n", [User])
