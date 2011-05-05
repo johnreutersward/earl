@@ -3,12 +3,8 @@
 -include_lib("eunit/include/eunit.hrl").
 
 init() ->
-    ets:new(clientTable, [set, public, named_table]),
-%--------Debug---------------------
-%	ets:insert(ClientTable, {self(), "foo", [main]}),
-%	io:format("ETS: ~w~n", [ets:info(clientTable)]),
-%----------------------------------
-	global:register_name(mainServer_PID, spawn(server, server, [])).
+    register(db,spawn(database,init,[])),
+    register(theServer, spawn(server, server, [])).
 
 server() ->
     io:format("Server pid: ~w~n", [self()]),
@@ -19,10 +15,12 @@ server() ->
 %	ets:insert(clientTable, {self(), "youngen", [main]}),
 %-----------------------------------
 	receive
-		{status, Pid, Alias, Status} ->  
-			ets:insert(clientTable, {Pid, Alias, Status});
-		{checkAlias, Pid, Alias} -> 
-			spawn(server, checkAlias, [Pid, Alias])		       	      
+	    {setStatus, Pid, Alias, Status} ->  
+		db ! {client,setStatus,Pid,Alias,Status};
+	    {checkAlias, Pid, Alias} -> 
+		db ! {checkAlias,Pid,Alias};	       	      
+	    {quit,Pid} ->
+		db ! {remove,Pid}
     end,
     server().
 
