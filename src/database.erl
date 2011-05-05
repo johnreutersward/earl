@@ -18,7 +18,7 @@ database() ->
 	{checkAlias,Origin,Alias} ->
 	    checkAlias(Origin,Alias);
 	{remove,Pid} ->
-	    ets:delete(clientTable,Pid)	    	    
+	    ets:delete(clientTable,Pid)
     end,
     database().
 
