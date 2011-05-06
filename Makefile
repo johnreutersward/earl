@@ -29,7 +29,7 @@ server.beam:	server.erl
 	$(CC) $<
     
 complete:
-        $(CC) $(ERLC_COMPLETE) $(SRC_DIR)/*.erl
+	$(CC) $(ERLC_COMPLETE) $(SRC_DIR)/*.erl
 
 clean:
 	rm -f *.beam
