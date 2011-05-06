@@ -12,6 +12,7 @@ database() ->
 			Origin ! ets:tab2list(clientTable);
 
 		{client,insert,{Pid,Alias,Status}} ->
+			io:format("Database: Inserting ~s as ~w in client table~n", Alias, Status),
 			ets:insert(clientTable,{Pid,Alias,Status});
 		
 		{client, getStatus, Pid, Origin} ->
@@ -25,17 +26,21 @@ database() ->
 		    checkAlias(Origin,Alias);
 		
 		{remove,Pid} ->
-		    ets:delete(clientTable,Pid)
+			io:format("Database: Removing ~w from client table~n", Pid),
+			ets:delete(clientTable,Pid)
     end,
     database().
 
 
 checkAlias(Origin, Alias) ->
-    Answer = ets:match(clientTable, {'$1', Alias, '_'}),
+    io:format("Database: Checking if alias ~s exists in client table~n", Alias),
+	Answer = ets:match(clientTable, {'$1', Alias, '_'}),
     if
 		Answer == [] -> 
+			io:format("Database: Alias ~s does not exist in client table~n", Alias),
 			Origin ! aliasTrue;
 		true -> 
+			io:format("Database: Alias ~s already exists in client table~n", Alias),
 			Origin ! aliasFalse
     end.
 
