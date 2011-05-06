@@ -15,7 +15,7 @@ test:	build
 	$(ERL) client_handler runtest
 	$(ERL) server runtest
 
-build:	client.beam client_handler.beam server.beam
+build:	client.beam client_handler.beam server.beam database.beam
 
 client.beam:	client.erl
 	$(CC) $<
@@ -25,7 +25,8 @@ client_handler.beam:	client_handler.erl
 
 server.beam:	server.erl
 	$(CC) $<
-
+database.beam:	database.erl
+	$(CC) $<
 
 clean:
 	rm -f *.beam
