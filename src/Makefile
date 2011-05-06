@@ -1,8 +1,8 @@
 
 CC = erlc -W
 ERL = erl -noshell -s
-ERL_SRV = erl -sname server -setcookie earl_game_club -s server init
-ERL_CLI = erl -noshell -sname client -setcookie earl_game_club -s client init
+ERL_SRV = erl -name server -setcookie earl_game_club -s server init
+ERL_CLI = erl -noshell -name client -setcookie earl_game_club -s client init
 
 client:	client.beam client_handler.beam
 	$(ERL_CLI)
