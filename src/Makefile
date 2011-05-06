@@ -7,7 +7,7 @@ ERL_CLI = erl -noshell -sname client -setcookie earl_game_club -s client init
 client:	client.beam client_handler.beam
 	$(ERL_CLI)
 
-server:	server.beam
+server:	server.beam database.beam
 	$(ERL_SRV) 
 
 test:	build
