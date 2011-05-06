@@ -1,5 +1,5 @@
 -module(server).
--export([init/0,server/0,checkAlias/2, runtest/0]).
+-export([init/0,server/0,runtest/0]).
 -include_lib("eunit/include/eunit.hrl").
 
 init() ->
@@ -17,6 +17,7 @@ server() ->
 	    db ! {remove,Pid}	
     end,
     server().
+%% <<<<<<< HEAD
 
 checkAlias(Pid, Alias) ->
     Answer = ets:match(clientTable, {'$1', Alias, '_'}),
@@ -27,7 +28,9 @@ checkAlias(Pid, Alias) ->
 	    Pid ! aliasFalse
     end.
 
-% Test cases
+%% =======
+%% >>>>>>> 30d7f39f95bc91f38ebc00607e76614c10442b68
+%% Test cases
 
 runtest() ->
     test(),

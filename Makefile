@@ -1,8 +1,10 @@
-
 CC = erlc -W
 ERL = erl -noshell -s
 ERL_SRV = erl -sname server -setcookie earl_game_club -s server init
 ERL_CLI = erl -noshell -sname client -setcookie earl_game_club -s client start
+EBIN_DIR = ebin
+SRC_DIR = src
+ERLC_COMPLETE = -o $(EBIN_DIR)
 
 client:	client.beam client_handler.beam
 	$(ERL_CLI)
@@ -25,7 +27,9 @@ client_handler.beam:	client_handler.erl
 
 server.beam:	server.erl
 	$(CC) $<
-
+    
+complete:
+        $(CC) $(ERLC_COMPLETE) $(SRC_DIR)/*.erl
 
 clean:
 	rm -f *.beam

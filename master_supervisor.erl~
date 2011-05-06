@@ -1,0 +1,19 @@
+-module(master_supervisor).
+-export([start_link/1, stop/1]).
+
+start_link(Name) ->
+    register(Name, spawn_link(master_supervisor, init, [])),
+    ok.
+
+init() ->
+    process_flag(trap_exit, true),
+    
+
+loop() ->
+    receive
+	{'EXIT', Pid, Reason} ->
+	    io:format("exit received: ~p", [Reason]).
+
+stop(Name) ->
+    Name ! {stop, self()},
+    receive {reply, Reply} -> Reply end.

@@ -1,1 +1,7 @@
-Interesting README FILE!!!
+Run instruction:
+1) Open two terminal windows
+2) In the first terminal, run the following command:
+    make server
+3) In the second terminal, run the following command:
+    make client
+4) Celebrate!
