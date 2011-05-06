@@ -17,7 +17,9 @@ server() ->
 	{checkAlias, Pid, Alias} -> 
 	    db ! {checkAlias,Pid,Alias};	       	      
 	{quit,Pid} ->
-	    db ! {remove,Pid}	
+	    db ! {remove,Pid};
+	{debug, Msg} ->
+		io:format("~s~n", Msg)	
     end,
     server().
 
