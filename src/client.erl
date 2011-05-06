@@ -26,11 +26,11 @@ client(ClientHandler) ->
 
 connect() ->
     Input = io:get_line("Connect to: "),
-    Server = string:strip(Input, both, $\n),
-    Server2 = list_to_atom(Server),
-    Answer = net_adm:ping(Server2),
+    Temp = string:strip(Input, both, $\n),
+    Server = list_to_atom(Temp),
+    Answer = net_adm:ping(Server),
     if	
-	Answer == pong -> ClientHandler = spawn(Server2,client_handler,init,[]),
+	Answer == pong -> ClientHandler = spawn(Server,client_handler,init,[]),
 			  client(ClientHandler);	 
 	true -> io:format("Connection ERROR~n",[]),
 		connect()
