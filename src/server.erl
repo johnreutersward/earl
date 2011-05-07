@@ -39,7 +39,7 @@ server() ->
 	    io:format("~s~n", [Msg]);
 	{getNumClients,Origin} ->
 	    io:format("server recevied 'getNumClients'",[]),
-	    db ! {getNumClients,Origin},
+	    db ! {getNumClients,Origin}
 	    
     end,
     server().
