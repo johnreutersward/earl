@@ -6,7 +6,7 @@ CLIENT = erl -noshell -sname client -setcookie earl_game_club -pa $(EBIN) -s cli
 
 all:
 	@mkdir -p $(EBIN)
-	@$(ERLC) $(SRC)/*.erl
+	$(ERLC) $(SRC)/*.erl
 	@echo "All compiled" 
 
 client:
