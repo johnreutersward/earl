@@ -35,7 +35,7 @@ create_alias(ClientPid) ->
 	    create_alias(ClientPid)
     end.
 
-%% @doc this is the men menu that the user sees upon entering the server.
+%% @doc this is the main menu that the user sees upon entering the server.
 %% from this function the user can enter game_menu() or quit().
 
 main_menu(ClientPid) ->
