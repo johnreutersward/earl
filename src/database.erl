@@ -1,5 +1,5 @@
 -module(database).
--export([init/0, printClients/0]).
+-export([init/0, printClients/0, printNumClients/0]).
 
 init() ->
     ets:new(clientTable,[set,named_table]),
@@ -15,6 +15,9 @@ database() ->
 		    X = ets:lookup(clientTable,Pid),
 		    Origin ! X;
 		
+		{getNumClients, Origin} ->
+			Origin ! ets:info(clientTable, size);
+
 		{setStatus, Pid, Alias, Status} ->
 			srv ! {debug, "Database: Setting status for "++Alias},
 			ets:insert(clientTable,{Pid,Alias,Status});
@@ -47,4 +50,10 @@ printClients() ->
 	receive
 		ClientList -> 
 			io:format("~w~n", ClientList)
+	end.
+printNumClients() ->
+	db ! {getNumClients, self()},
+	receive
+		Num ->
+			io:format("~p~n", Num)
 	end.
