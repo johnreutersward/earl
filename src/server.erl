@@ -3,11 +3,14 @@
 %% @author John Reuterswärd <rojters@gmail.com>
 %% @author Simon Young <youngen.simon@gmail.com>
 %% @doc This is the main server that handles all the communication between
-%% clients and the database.
+%% clients and clients to database the database.
 
 -module(server).
 -export([init/0,server/0,runtest/0,msgSender/3]).
 -include_lib("eunit/include/eunit.hrl").
+
+%% @doc initiates the server
+%% @spec init() -> server()
 
 init() ->
     register(srv, self()),
@@ -20,6 +23,9 @@ init() ->
     io:format("         Cookie: ~s~n", [erlang:get_cookie()]),
     io:format("-----------------------------------------------~n~n", []),
     server().
+
+%% @doc receives messages and realays them to the db or start other processes to handle the
+%% the message.
 
 server() ->
     receive
@@ -38,9 +44,8 @@ server() ->
 	{debug, Msg} ->
 	    io:format("~s~n", [Msg]);
 	{getNumClients,Origin} ->
-	    io:format("server recevied 'getNumClients'",[]),
+	    io:format("server recevied 'getNumClients'~n",[]),
 	    db ! {getNumClients,Origin}
-	    
     end,
     server().
 
@@ -48,6 +53,7 @@ server() ->
 
 
 %% @doc Gets the Status of the process with Process Id Pid
+%% @spec getStatus(Pid) -> Status
 
 getStatus(Pid) ->
     db ! {getStatus,Pid,self()},
@@ -57,6 +63,7 @@ getStatus(Pid) ->
     end.
 
 %% @doc gets a list of all the processes with the status Status.
+%% @spec getStatusLst(Status) -> StatusList
 
 getStatusList(Status) ->
     db ! {getStatusList, Status, self()},
@@ -71,6 +78,8 @@ sendMsg([], _, _) -> ok;
 sendMsg([H | T], Alias, Msg) ->
     H ! {message, Alias,Msg},
     sendMsg(T, Alias, Msg).
+
+%% @doc sends a message to all Pids with the same status as Pid
 
 msgSender(Msg, Pid, Alias) ->
     Status = getStatus(Pid),
