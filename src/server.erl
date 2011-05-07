@@ -3,24 +3,34 @@
 -include_lib("eunit/include/eunit.hrl").
 
 init() ->
+    register(srv, self()),
     register(db,spawn(database,init,[])),
-    register(theServer, self()),
+	io:format("-----------------------------------------------~n", []),
+	io:format("------  Earl Game Club server initiated  ------~n", []),
+	io:format("-----------------------------------------------~n", []),
+	io:format("         Host:   ~s~n", [net_adm:localhost()]),
+	io:format("         Node:   ~s~n", [node()]),
+	io:format("         Cookie: ~s~n", [erlang:get_cookie()]),
+	io:format("-----------------------------------------------~n~n", []),
     server().
 
 server() ->
-    io:format("Server pid: ~w~n", [self()]),
     receive
-	{say,Msg,Pid,Alias} ->
-	    spawn(server,msgSender,[Msg,Pid,Alias]);
-	{setStatus, Pid, Alias,Status} ->  
-	    db ! {client,setStatus,Pid,Alias,Status};
-	{checkAlias, Pid, Alias} -> 
-	    db ! {checkAlias,Pid,Alias};	       	      
-	{quit,Pid} ->
-	    db ! {remove,Pid};
-	{debug, Msg} ->
-		io:format("~s~n", Msg)	
-    end,
+		{say, Msg, Pid, Alias} ->
+			io:format("Server: Received 'say', spawning message-sender~n", []),
+		    spawn(server, msgSender, [Msg, Pid, Alias]);
+		{setStatus, Pid, Alias,Status} ->  
+			io:format("Server: Received 'setStatus' request, forwarding to database~n", []),
+			db ! {setStatus, Pid, Alias, Status};
+		{checkAlias, Alias, Origin} -> 
+			io:format("Server: Received 'checkAlias', forwarding to db~n", []),
+			db ! {checkAlias, Alias, Origin};	       	      
+		{quit, Pid} ->
+			io:format("Server: Received 'quit' from pid, sending removal request to db~n", []),
+		    db ! {remove,Pid};
+		{debug, Msg} ->
+			io:format("~s~n", [Msg])
+	end,
     server().
 
 %% HELP FUNCTIONS %%
@@ -38,23 +48,23 @@ getStatus(Pid) ->
 %% @doc gets a list of all the processes with the status Status.
 
 getStatusList(Status) ->
-    db ! {getStatusList,Status,self()},
+    db ! {getStatusList, Status, self()},
     receive
-	{answer,StatusList} ->
-	    StatusList
+		{answer, StatusList} ->
+		    StatusList
     end.
 	    
 %% @doc sends a message to all the PIDs in the List
 
-sendMsg([],_,_) -> ok;
-sendMsg([H | T],Alias,Msg) ->
+sendMsg([], _, _) -> ok;
+sendMsg([H | T], Alias, Msg) ->
     H ! {message, Alias,Msg},
-    sendMsg(T,Alias,Msg).
+    sendMsg(T, Alias, Msg).
 
-msgSender(Msg,Pid,Alias) ->
+msgSender(Msg, Pid, Alias) ->
     Status = getStatus(Pid),
     StatusList = getStatusList(Status),
-    sendMsg(StatusList,Alias,Msg).
+    sendMsg(StatusList, Alias, Msg).
 
 % Test cases
 

@@ -7,45 +7,43 @@ init() ->
     
 
 database() ->
-    receive
-		{client, getAll, Origin} ->
+	receive
+		{getAll, Origin} ->
 			Origin ! ets:tab2list(clientTable);
 
-		{client,insert,{Pid,Alias,Status}} ->
-			io:format("Database: Inserting ~s as ~w in client table~n", Alias, Status),
-			ets:insert(clientTable,{Pid,Alias,Status});
-		
-		{client, getStatus, Pid, Origin} ->
+		{getStatus, Pid, Origin} ->
 		    X = ets:lookup(clientTable,Pid),
 		    Origin ! X;
 		
-		{client,setStatus, Pid, Alias, Status} ->
-		    ets:insert(clientTable,{Pid,Alias,Status});
+		{setStatus, Pid, Alias, Status} ->
+			srv ! {debug, "Database: Setting status for "++Alias},
+			ets:insert(clientTable,{Pid,Alias,Status});
 		
-		{checkAlias,Origin,Alias} ->
-		    checkAlias(Origin,Alias);
+		{checkAlias, Alias, Origin} ->
+		    checkAlias(Alias, Origin);
 		
 		{remove,Pid} ->
-			io:format("Database: Removing ~w from client table~n", Pid),
+			srv ! {debug, "Database: Removing client from client table"},
 			ets:delete(clientTable,Pid)
     end,
     database().
 
 
-checkAlias(Origin, Alias) ->
-    io:format("Database: Checking if alias ~s exists in client table~n", Alias),
+checkAlias(Alias, Origin) ->
+	srv ! {debug, "Database: Checking if alias '"++Alias++"' exists in client table"},
 	Answer = ets:match(clientTable, {'$1', Alias, '_'}),
     if
 		Answer == [] -> 
-			io:format("Database: Alias ~s does not exist in client table~n", Alias),
-			Origin ! aliasTrue;
+			srv ! {debug, "Database: Alias '"++Alias++"' does not exist in client table, returning valid"},
+			Origin ! aliasValid;
 		true -> 
-			io:format("Database: Alias ~s already exists in client table~n", Alias),
-			Origin ! aliasFalse
-    end.
+			srv ! {debug, "Database: Alias '"++Alias++"' already exists in client table"},
+			Origin ! aliasInvalid 
+	end, 
+	ok.
 
 printClients() ->
-	db ! {client, getAll, self()},
+	db ! {getAll, self()},
 	receive
 		ClientList -> 
 			io:format("~w~n", ClientList)

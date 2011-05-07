@@ -4,7 +4,7 @@
 %% @todo add more client functions. Complete gamemode function.
 
 -module(client).
--export([connect/0,say/2,challange/2,quit/1, runtest/0]).
+-export([connect/0,wait/0, quit/0, runtest/0]).
 -export([init/0]).
 
 -include_lib("eunit/include/eunit.hrl").
@@ -13,60 +13,42 @@
 %% @spec start() -> client
 	     
 init() ->
+	io:format("~n---------------------------------------~n", []),
+	io:format("------  Earl's Game Club client  ------~n", []),
+	io:format("---------------------------------------~n", []),
     connect().
-
-client(ClientHandler) ->
-    Command = io:get_line("> "),
-    Command2 = string:strip(Command, both, $\n), %% tar bort \n
-    command(string:tokens(Command2, " "),ClientHandler),
-    client(ClientHandler).
 
 %% @doc connects to the server
 %% @spec connect() -> {connect,Server}
-
 connect() ->
-    Input = io:get_line("Connect to: "),
+	io:format("~nPlease enter the Earl server you wish to connect to: ~n", []),
+    Input = io:get_line("> "),
     Temp = string:strip(Input, both, $\n),
     Server = list_to_atom(Temp),
     Answer = net_adm:ping(Server),
     if	
-	Answer == pong -> ClientHandler = spawn(Server,client_handler,init,[]),
-			  client(ClientHandler);	 
-	true -> io:format("Connection ERROR~n",[]),
-		connect()
+		Answer == pong -> 
+			spawn(Server,client_handler,init,[self()]),
+			wait();
+		true -> 
+			io:format("~nERROR: The specified server could not be found.~n",[]),
+			connect()
     end.
 
-%% @doc this function parses String into difrent commands.
-
-command([Command | Input],ClientHandler) ->
-    case(Command) of
-	"say" ->
-	    say(Input,ClientHandler);
-	"challange" ->
-	    challange(Input,ClientHandler);
-	"quit" -> 
-	    quit(ClientHandler);
-	true -> io:format("Unknown command~n",[])
+wait() ->
+    receive
+		{quit} ->
+			quit()
     end.
 
-%% @doc sends a message to the server
-%% @spec say() -> {say,Msg}
+quit() ->
+	init:stop().
 
-say(Msg,ClientHandler) ->
-    ClientHandler ! {say,Msg}.
-
-%% @doc sends a challange to another user
-%% @spec challange() -> {challange,User}
-
-challange(User,ClientHandler) ->
-    ClientHandler ! {challange,User}. 
-
-%% @doc log off the server.
-%% @spec quit() -> {quit}
-
-quit(ClientHandler) ->
-    ClientHandler ! {quit},
-    init:stop().
+%client(ClientHandler) ->
+%    Command = io:get_line("> "),
+%    Command2 = string:strip(Command, both, $\n), %% tar bort \n
+%    command(string:tokens(Command2, " "),ClientHandler),
+%    client(ClientHandler).
 
 
 %% TEST CASES %%
