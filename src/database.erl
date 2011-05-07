@@ -26,6 +26,10 @@ database() ->
 	{getStatus, Pid, Origin} ->
 	    X = ets:lookup(clientTable,Pid),
 	    Origin ! X;
+
+	{getSameStatus, Status, Origin} ->
+		X = ets:match(clientTable, {'$1', '$2', Status}),
+		Origin ! {statusList, X};  
 	
 	{getNumClients, Origin} ->
 	    Origin ! ets:info(clientTable, size);

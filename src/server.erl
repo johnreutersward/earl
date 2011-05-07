@@ -6,7 +6,7 @@
 %% clients and clients to database the database.
 
 -module(server).
--export([init/0,server/0,runtest/0,msgSender/3]).
+-export([init/0,server/0,runtest/0,spawnGameRooms/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the server
@@ -15,6 +15,7 @@
 init() ->
     register(srv, self()),
     register(db,spawn(database,init,[])),
+	spawnGameRooms([]),
     io:format("-----------------------------------------------~n", []),
     io:format("------  Earl Game Club server initiated  ------~n", []),
     io:format("-----------------------------------------------~n", []),
@@ -29,12 +30,13 @@ init() ->
 
 server() ->
     receive
-	{say, Msg, Pid, Alias} ->
-	    io:format("Server: Received 'say', spawning message-sender~n", []),
-	    spawn(server, msgSender, [Msg, Pid, Alias]);
 	{setStatus, Pid, Alias,Status} ->  
 	    io:format("Server: Received 'setStatus' request, forwarding to database~n", []),
 	    db ! {setStatus, Pid, Alias, Status};
+	{enterGameRoom, Pid, Alias, Game} ->
+		io:format("Server: Received 'enterGameRoom' request, forwarding to database~n", []),
+		db ! {setStatus, Pid, Alias, [game, Game]},
+		Game ! {newPlayer, Pid, Alias};
 	{checkAlias, Alias, Origin} -> 
 	    io:format("Server: Received 'checkAlias', forwarding to db~n", []),
 	    db ! {checkAlias, Alias, Origin};	       	      
@@ -45,46 +47,22 @@ server() ->
 	    io:format("~s~n", [Msg]);
 	{getNumClients,Origin} ->
 	    io:format("server recevied 'getNumClients'~n",[]),
-	    db ! {getNumClients,Origin}
+	    db ! {getNumClients,Origin};
+	{getSameStatus, Status, Origin} ->
+		io:format("Server recevied 'getSameStatus'~n", []),
+		db ! {getSameStatus, Status, Origin}
     end,
     server().
 
 %% HELP FUNCTIONS %%
 
+%% @doc Spawns a game room for all games in a list
+%% @spec spawnGameRooms(List) -> ok
 
-%% @doc Gets the Status of the process with Process Id Pid
-%% @spec getStatus(Pid) -> Status
-
-getStatus(Pid) ->
-    db ! {getStatus,Pid,self()},
-    receive
-	{answer,Status} ->
-	    Status
-    end.
-
-%% @doc gets a list of all the processes with the status Status.
-%% @spec getStatusLst(Status) -> StatusList
-
-getStatusList(Status) ->
-    db ! {getStatusList, Status, self()},
-    receive
-	{answer, StatusList} ->
-	    StatusList
-    end.
-
-%% @doc sends a message to all the PIDs in the List
-
-sendMsg([], _, _) -> ok;
-sendMsg([H | T], Alias, Msg) ->
-    H ! {message, Alias,Msg},
-    sendMsg(T, Alias, Msg).
-
-%% @doc sends a message to all Pids with the same status as Pid
-
-msgSender(Msg, Pid, Alias) ->
-    Status = getStatus(Pid),
-    StatusList = getStatusList(Status),
-    sendMsg(StatusList, Alias, Msg).
+spawnGameRooms([]) -> ok;
+spawnGameRooms([{GameModule, DisplayName}|T]) ->
+	register(GameModule, spawn(game_room, init, [GameModule, DisplayName])),
+	spawnGameRooms(T). 
 
 % Test cases
 
