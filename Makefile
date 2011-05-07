@@ -9,11 +9,11 @@ all:
 	$(ERLC) $(SRC)/*.erl
 	@echo "All compiled" 
 
-client:
+client:	all
 	@clear
 	@$(CLIENT)
 	
-server:
+server:	all
 	@clear	
 	@$(SERVER)
 	
