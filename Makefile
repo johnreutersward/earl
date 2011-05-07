@@ -6,14 +6,16 @@ CLIENT = erl -noshell -sname client -setcookie earl_game_club -pa $(EBIN) -s cli
 
 all:
 	@mkdir -p $(EBIN)
-	@$(ERLC) $(SRC)/*.erl
+	$(ERLC) $(SRC)/*.erl
 	@echo "All compiled" 
 
-client:
-	$(CLIENT)
+client:	all
+	@clear
+	@$(CLIENT)
 	
-server:
-	$(SERVER)
+server:	all
+	@clear	
+	@$(SERVER)
 	
 clean:
 	@rm -fv $(EBIN)/*.beam
