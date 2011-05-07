@@ -50,8 +50,8 @@ main_menu(ClientPid) ->
 	    game_menu(),
 	    main_menu(ClientPid);
 	"2" ->
-	    io:format("~nStats are not yet implemented.~n", []),
-	    main_menu(ClientPid);
+		numConnected(),
+		main_menu(ClientPid);
 	"3" ->
 	    io:format("~nHelp is not yet implemented.~n", []),
 	    main_menu(ClientPid);
