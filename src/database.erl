@@ -1,5 +1,5 @@
 -module(database).
--export([init/0, printClients/0]).
+-export([init/0, printClients/0, printNumClients/0]).
 
 init() ->
     ets:new(clientTable,[set,named_table]),
