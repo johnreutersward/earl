@@ -9,47 +9,44 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-%% @doc Starts the client.
-%% @spec start() -> client
+%% @doc Starts connect.
+%% @spec init() -> connect()
 	     
 init() ->
-	io:format("~n---------------------------------------~n", []),
-	io:format("------  Earl's Game Club client  ------~n", []),
-	io:format("---------------------------------------~n", []),
+    io:format("~n---------------------------------------~n", []),
+    io:format("------  Earl's Game Club client  ------~n", []),
+    io:format("---------------------------------------~n", []),
     connect().
 
-%% @doc connects to the server
-%% @spec connect() -> {connect,Server}
+%% @doc connects to the server and spawns the init function in a given server.
+%% @spec connect() -> wait()
 connect() ->
-	io:format("~nPlease enter the Earl server you wish to connect to: ~n", []),
+    io:format("~nPlease enter the Earl server you wish to connect to: ~n", []),
     Input = io:get_line("> "),
     Temp = string:strip(Input, both, $\n),
     Server = list_to_atom(Temp),
     Answer = net_adm:ping(Server),
     if	
-		Answer == pong -> 
-			spawn(Server,client_handler,init,[self()]),
-			wait();
-		true -> 
-			io:format("~nERROR: The specified server could not be found.~n",[]),
-			connect()
+	Answer == pong -> 
+	    spawn(Server,client_handler,init,[self()]),
+	    wait();
+	true -> 
+	    io:format("~nERROR: The specified server could not be found.~n",[]),
+	    connect()
     end.
+%% @doc Waits for {quit} message and then runs quit()
+%% @spec wait() -> quit()
 
 wait() ->
     receive
-		{quit} ->
-			quit()
+	{quit} ->
+	    quit()
     end.
 
+%% @doc kills the program.
+
 quit() ->
-	init:stop().
-
-%client(ClientHandler) ->
-%    Command = io:get_line("> "),
-%    Command2 = string:strip(Command, both, $\n), %% tar bort \n
-%    command(string:tokens(Command2, " "),ClientHandler),
-%    client(ClientHandler).
-
+    init:stop().
 
 %% TEST CASES %%
 
