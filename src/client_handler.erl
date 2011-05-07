@@ -1,11 +1,11 @@
 
 -module(client_handler).
--export([init/1, create_alias/1, main_menu/1, game_menu/0, getInput/0, trim/1, runtest/0]).
+-export([init/1, create_alias/1, main_menu/1, game_menu/0, getInput/0, trim/1, runtest/0, numConnected/0]).
 -include_lib("eunit/include/eunit.hrl").
 
 init(ClientPid) ->
-    NoOnline = 2,
-	io:format("~n-- Welcome to Earl's Game Club!~nNumber of users online: ~w~n~n", [NoOnline]),
+	io:format("~n-- Welcome to Earl's Game Club!~n", []),
+	numConnected(),
     create_alias(ClientPid).
 
 create_alias(ClientPid) ->
@@ -62,6 +62,15 @@ game_menu() ->
 		_ ->
 			io:format("~nIllegal command~n", []),
 			game_menu()
+	end.
+
+numConnected() ->
+	srv ! {getNumClients, self()},
+	receive
+		NumClients ->
+			io:format("Number of clients connected: ~p~n", [NumClients])
+	after 1000 ->
+		io:format("Failed to receive number of clients~n", [])
 	end.
 
 getInput() ->
