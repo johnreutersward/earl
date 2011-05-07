@@ -7,7 +7,11 @@ CLIENT = erl -noshell -sname client -setcookie earl_game_club -pa $(EBIN) -s cli
 all:
 	@mkdir -p $(EBIN)
 	$(ERLC) $(SRC)/*.erl
-	@echo "All compiled" 
+	@echo "All compiled"
+
+doc:	all
+		# erl -noshell -run edoc_run files ($(SRC)/*.erl)
+		echo "Not yet implemented"
 
 client:	all
 	@clear
@@ -15,7 +19,7 @@ client:	all
 	
 server:	all
 	@clear	
-	@$(SERVER)
+	$(SERVER)
 	
 clean:
 	@rm -fv $(EBIN)/*.beam
