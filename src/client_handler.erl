@@ -43,7 +43,7 @@ main_menu(ClientPid) ->
     io:format("1 - Select game ~n", []),
     io:format("2 - Show statistics ~n", []),
     io:format("3 - Help ~n", []),
-    io:format("4 - Quit ~n", []),
+    io:format("4 - Quit ~n?> ", []),
     
     case(getInput()) of
 	"1" ->
@@ -68,7 +68,7 @@ game_menu() ->
     io:format("~n --Game Menu--~n", []),
     io:format("1 - Tic tac toe ~n", []),
     io:format("2 - Guess a number ~n", []),
-    io:format("3 - Back to Main Menu~n", []),
+    io:format("3 - Back to Main Menu~n?> ", []),
     case(getInput()) of
 	"1" ->
 	    io:format("'Tic tac toe' is not implemented yet.~n", []),
