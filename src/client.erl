@@ -1,7 +1,10 @@
+%% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
+%% @author Andreas Hammar <andreashammar@gmail.com>
+%% @author John Reuterswärd <rojters@gmail.com>
 %% @author Simon Young <youngen.simon@gmail.com>
 %% @doc The Client module. This module allows a user to connect to Earl's Game Club
 %% and speak to that server with client functions.
-%% @todo add more client functions. Complete gamemode function.
+
 
 -module(client).
 -export([connect/0,wait/0, quit/0, runtest/0]).
