@@ -1,8 +1,8 @@
 EBIN = ebin
 SRC = src
 ERLC = erlc -W -o $(EBIN)
-SERVER = erl -name server -setcookie earl_game_club -pa $(EBIN) -s server init
-CLIENT = erl -noshell -name client -setcookie earl_game_club -pa $(EBIN) -s client init
+SERVER = erl -sname server -setcookie earl_game_club -pa $(EBIN) -s server init
+CLIENT = erl -noshell -sname client -setcookie earl_game_club -pa $(EBIN) -s client init
 
 all:
 	@mkdir -p $(EBIN)
