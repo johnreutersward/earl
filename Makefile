@@ -10,10 +10,12 @@ all:
 	@echo "All compiled" 
 
 client:
-	$(CLIENT)
+	@clear
+	@$(CLIENT)
 	
 server:
-	$(SERVER)
+	@clear	
+	@$(SERVER)
 	
 clean:
 	@rm -fv $(EBIN)/*.beam
