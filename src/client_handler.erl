@@ -132,13 +132,9 @@ help(ClientPid) ->
     io:format("QUIT:~n",[]),
     io:format("Press 4 to leave the server. You will then return to the directory you where in before you connected to Earl's Game Club.~n~n",[]),
     
-    
-    io:format("Press any key to go back to Main Menu~n", []),
-    Any_button = getNumber(), 
-    case(Any_button) of
-	_ ->
-	    main_menu(ClientPid)
-    end.
+    io:format("Press [ENTER] to go back to Main Menu~n", []),
+	getInput(),    
+	main_menu(ClientPid).
 
 
 %% HELP FUNCTIONS %%
