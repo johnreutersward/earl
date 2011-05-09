@@ -1,6 +1,5 @@
 %% @author Andreas Hammar <andreashammar@ymail.com>
-%% @doc Spawns a supervisor for the client and initiates the client using the
-%% built in supervisor module.
+%% @doc A supervisor that messages the client_handler if a client dies.
 
 -module(client_supervisor).
 -export([init/1, loop/1]).
@@ -14,7 +13,7 @@ init(ClientHandler) ->
 	process_flag(trap_exit, true),
 	loop(ClientHandler).
 
-%% @doc Notifies the server if a client dies.
+%% @doc Notifies the client_handler if a client dies.
 %% @spec loop() -> ok
 
 loop(ClientHandler) ->

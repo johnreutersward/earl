@@ -15,7 +15,8 @@
 %% @spec init() -> connect()
 	     
 init() ->
-    io:format("~n---------------------------------------~n", []),
+	erlang:set_cookie(node(), earl_game_club),
+	io:format("~n---------------------------------------~n", []),
     io:format("------  Earl's Game Club client  ------~n", []),
     io:format("---------------------------------------~n", []),
     connect().

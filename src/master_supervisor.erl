@@ -11,7 +11,7 @@
 
 start() -> 
 	io:format("starting...~n"),
-	Pid = spawn_link(server, server, []), 
+	Pid = spawn_link(server, init, []), 
 	{ok, Pid}.
 
 init(_) ->
@@ -23,5 +23,5 @@ init(_) ->
 %% @spec run() -> ok
 
 run() ->
-	supervisor:start_link(client_supervisor, []),
+	supervisor:start_link(master_supervisor, []),
 	ok.

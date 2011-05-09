@@ -13,7 +13,8 @@
 %% @spec init() -> server()
 
 init() ->
-    register(srv, self()),
+	erlang:set_cookie(node(), earl_game_club),
+	register(srv, self()),
     register(db,spawn(database,init,[])),
 	spawnGameRooms([{glhf,"GLHF"},{tictactoe,"Tic Tac Toe"}]),
     io:format("-----------------------------------------------~n", []),
