@@ -54,8 +54,7 @@ main_menu(ClientPid) ->
 		numConnected(),
 		main_menu(ClientPid);
 	"3" ->
-	    io:format("~nHelp is not yet implemented.~n", []),
-	    main_menu(ClientPid);
+	    help(ClientPid);
 	"4" ->
 	    quit(ClientPid);
 	_ ->
@@ -122,6 +121,24 @@ quit(ClientPid) ->
     io:format("~nBye!~n",[]),
     srv ! {quit, self()},
     ClientPid ! {quit}. 
+
+help(ClientPid) ->
+    io:format("~n --Help-- ~n~n", []),
+    io:format("SELECT GAME:~n",[]),
+    io:format("Press 1 to get the list of available games.~n",[]),
+    io:format("You will then be able to choose the game you want to play.~n~n",[]),
+    io:format("STATISTICS:~n",[]),
+    io:format("Press 2 to get the information about the current users online.~n~n",[]),
+    io:format("QUIT:~n",[]),
+    io:format("Press 4 to leave the server. You will then return to the directory you where in before you connected to Earl's Game Club.~n~n",[]),
+    
+    
+    io:format("Press any key to go back to Main Menu~n", []),
+    Any_button = getNumber(), 
+    case(Any_button) of
+	_ ->
+	    main_menu(ClientPid)
+    end.
 
 
 %% HELP FUNCTIONS %%
