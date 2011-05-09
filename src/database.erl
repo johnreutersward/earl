@@ -7,7 +7,7 @@
 
 
 -module(database).
--export([init/0, printClients/0, printNumClients/0]).
+-export([init/0, clients/0, printClients/1, printNumClients/0]).
 
 %% @doc initiates the database.
 %% @spec init() -> database()
@@ -67,12 +67,18 @@ checkAlias(Alias, Origin) ->
 %% @doc prints all the clints in the database.
 %% @spec printClients() -> {getAll,self()}
 
-printClients() ->
+clients() ->
     db ! {getAll, self()},
     receive
 	ClientList -> 
-	    io:format("~w~n", ClientList)
+	    printClients(ClientList)
     end.
+
+printClients([]) ->
+	done;
+printClients([{Pid, Alias, Status} | T]) ->
+	io:format("{~w, ~s, ~w}~n", [Pid, Alias, Status]),
+	printClients(T).
 
 %% @doc prints the number of clients currently online.
 %% @spec printNumClients() -> {getNumClients, self()}
