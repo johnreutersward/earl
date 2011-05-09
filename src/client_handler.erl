@@ -7,7 +7,7 @@
 %% and the server.
 
 -module(client_handler).
--export([init/1, create_alias/1, main_menu/1, game_menu/3, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/3]).
+-export([init/1, create_alias/1, main_menu/2, game_menu/4, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the client handler.
@@ -29,7 +29,7 @@ create_alias(ClientPid) ->
     receive
 	aliasValid -> 
 	    srv ! {setStatus, self(), Alias, [main]},
-	    main_menu(ClientPid);
+	    main_menu(ClientPid,Alias);
         aliasInvalid -> 
 	    io:format("Alias is already in use, please choose another Alias~n", []),
 	    create_alias(ClientPid)
@@ -38,7 +38,7 @@ create_alias(ClientPid) ->
 %% @doc this is the main menu that the user sees upon entering the server.
 %% from this function the user can enter game_menu() or quit().
 
-main_menu(ClientPid) ->
+main_menu(ClientPid,Alias) ->
     GL = [{glhf, "GLHF"}, {tictactoe, "Tic Tac Toe"}],
     io:format("~n --Main Menu-- ~n", []),
     io:format("1 - Select game ~n", []),
@@ -48,31 +48,31 @@ main_menu(ClientPid) ->
     
     case(getInput()) of
 	"1" ->
-	    game_menu(GL,1,GL),
-	    main_menu(ClientPid);
+	    game_menu(GL,1,Alias,GL),
+	    main_menu(ClientPid, Alias);
 	"2" ->
 	    numConnected(),
-		main_menu(ClientPid);
+		main_menu(ClientPid,Alias);
 	"3" ->
-	    help(ClientPid);
+	    help(ClientPid,Alias);
 	"4" ->
 	    quit(ClientPid);
 	_ ->
 	    io:format("~nIllegal command~n",[]),
-	    main_menu(ClientPid)
+	    main_menu(ClientPid,Alias)
     end.
 
 %% @doc prints out the game menu for the user, and enables the user to connect to a game room.
 
 
-game_menu([], Num, GameList) -> 
+game_menu([], Num,Alias,GameList) -> 
     IntString = integer_to_list(Num),
     io:format(IntString ++ " - Back to Main Menu~n?> ", []),
     Input = getNumber(), 
     case(Input) of
 	error ->
 	    io:format("Illegal command!~n", []),
-	    game_menu(GameList,1,GameList);
+	    game_menu(GameList,1,Alias,GameList);
 	_ when Input > 0 , Input < Num ->
 	    io:format("~w~n",[Input]),
 	    Temp = lists:nth(Input,GameList),
@@ -81,17 +81,17 @@ game_menu([], Num, GameList) ->
 	    receive
 		{message, Sender, Message} ->
 		    io:format("~s says: ~s",[Alias,Message]);
-		{quit} -> game_menu(GameList,1,GameList)
+		{quit} -> game_menu(GameList,1,Alias,GameList)
 	    end;
 	_ when Input == Num ->
 	    ok;	
 	_ -> 
 	    io:format("Illegal command!~n", []),
-	    game_menu(GameList, 1, GameList)
+	    game_menu(GameList, 1, Alias,GameList)
     end;
-game_menu([{_, DisplayName} | GameListIter], Num, GameList) ->
+game_menu([{_, DisplayName} | GameListIter], Num, Alias,GameList) ->
     io:format("~p - ~s ~n", [Num, DisplayName]),
-    game_menu(GameListIter, Num+1, GameList).
+    game_menu(GameListIter, Num+1, Alias,GameList).
 
 %% @doc shows number of clients connected to the server.
 %% @spec numConnected() -> {getNumCluents,self()}
@@ -130,7 +130,7 @@ quit(ClientPid) ->
     srv ! {quit, self()},
     ClientPid ! {quit}. 
 
-help(ClientPid) ->
+help(ClientPid,Alias) ->
     io:format("~n --Help-- ~n~n", []),
     io:format("SELECT GAME:~n",[]),
     io:format("Press 1 to get the list of available games.~n",[]),
@@ -142,7 +142,7 @@ help(ClientPid) ->
     
     io:format("Press [ENTER] to go back to Main Menu~n", []),
 	getInput(),    
-	main_menu(ClientPid).
+	main_menu(ClientPid,Alias).
 
 
 gameRoom(Game,Pid,Alias,0) ->
