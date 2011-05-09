@@ -4,37 +4,39 @@
 
 
 init(Game, GameName) ->
-	srv ! {debug, "New game room spawned."},
-	srv ! {getSameStatus, [game, Game], self()},
-	receive
-		{statusList, PlayersList} ->
-			room(Game, GameName, PlayersList)
-	end
-.
+    srv ! {debug, "New game room spawned."},
+    srv ! {getSameStatus, [game, Game], self()},
+    receive
+	{statusList, PlayersList} ->
+	    room(Game, GameName, PlayersList)
+    end.
+	
 
 room(Game, GameName, PlayerList) ->
-	receive
-		{newPlayer, Pid, Alias} ->
-			srv ! {debug, "New player added to "++GameName++" room"},
-			Pid ! {message, "Welcome to "++GameName++" game room!"},
-			sendMessage(PlayerList, "", Alias++" has joined the room"),
-			[{Pid, Alias, [game, Game]} | PlayerList];
-		{quitPlayer, Pid, Alias} ->
-			NewPlayerList = lists:keydelete(Pid, 1, PlayerList),
-			srv ! {setStatus, Pid, Alias, [main]},
-			sendMessage(PlayerList, "", Alias++" has left the room.");
-		{input, Pid, Alias, Input} ->
-			spawn(game_room,handleInput, [self(), Input, Pid, Alias, PlayerList])
-	end,
-	room(Game, GameName, PlayerList).
+    receive
+	{newPlayer, Pid, Alias} ->
+	    srv ! {debug, "New player added to "++GameName++" room"},
+	    Pid ! {message, "Welcome to "++GameName++" game room!"},
+	    sendMessage(PlayerList, "", Alias++" has joined the room"),
+	    NewPlayerList = [{Pid, Alias, [game, Game]} | PlayerList];
+	{quitPlayer, Pid, Alias} ->
+	    NewPlayerList = lists:keydelete(Pid, 1, PlayerList),
+	    srv ! {setStatus, Pid, Alias, [main]},
+	    sendMessage(PlayerList, "", Alias++" has left the room.");
+	{input, Pid, Alias, Input} ->
+	    srv ! {debug, "Handle player input "++GameName++" room"},
+	    spawn(game_room,handleInput, [self(), Input, Pid, Alias, PlayerList]),
+	    NewPlayerList = PlayerList		
+    end,
+    room(Game, GameName, NewPlayerList).
 
 handleInput(RoomPid, Input, Pid, Alias, PlayerList) ->
-	if 
-		[hd(Input)] == "/" ->
-			Command = commandParser(Input,Pid,Alias, PlayerList);
-		true ->
-			sendMessage(PlayerList,Alias,Input)
-	end
+    if 
+	[hd(Input)] == "/" ->
+	    Command = commandParser(Input,Pid,Alias, PlayerList);
+	true ->
+	    sendMessage(PlayerList,Alias,Input)
+    end
 	.
 commandParser([_, Input], Pid, Alias, PlayerList) ->
     [Command | Params] = string:split(Input, " "),
@@ -52,11 +54,16 @@ commandParser([_, Input], Pid, Alias, PlayerList) ->
 
 printPlayers([]) -> ok;
 printPlayers([Alias | AliasList]) ->
-		io:format("~w ", [Alias]),
-		printPlayers(AliasList).
+    io:format("~w ", [Alias]),
+    printPlayers(AliasList).
 
-sendMessage([], Alias, Message) ->
-	ok;
-sendMessage([{H, _, _} | T], Alias, Message) ->
-	H ! {message, Alias, Message},
-	sendMessage(T, Alias, Message).
+sendMessage([], _, _) ->
+    ok;
+sendMessage([{H, User, _} | T], Alias, Message) ->
+    if 
+	User == Alias ->
+	    sendMessage(T,Alias,Message);
+	true ->
+	    H ! {message, Alias, Message}
+    end,
+    sendMessage(T, Alias, Message).

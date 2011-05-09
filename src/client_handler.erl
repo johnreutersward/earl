@@ -7,7 +7,7 @@
 %% and the server.
 
 -module(client_handler).
--export([init/1, create_alias/1, main_menu/2, game_menu/4, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2]).
+-export([init/1, create_alias/1, main_menu/2, game_menu/4, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2,receiver/3]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the client handler.
@@ -78,11 +78,7 @@ game_menu([], Num,Alias,GameList) ->
 	    Temp = lists:nth(Input,GameList),
 	    TheGame = element(1,Temp),
 	    spawn(client_handler,gameRoom,[TheGame,self(),Alias,0]),
-	    receive
-		{message, Sender, Message} ->
-		    io:format("~s says: ~s",[Alias,Message]);
-		{quit} -> game_menu(GameList,1,Alias,GameList)
-	    end;
+	    receiver(GameList,1,Alias);
 	_ when Input == Num ->
 	    ok;	
 	_ -> 
@@ -141,8 +137,8 @@ help(ClientPid,Alias) ->
     io:format("Press 4 to leave the server. You will then return to the directory you where in before you connected to Earl's Game Club.~n~n",[]),
     
     io:format("Press [ENTER] to go back to Main Menu~n", []),
-	getInput(),    
-	main_menu(ClientPid,Alias).
+    getInput(),    
+    main_menu(ClientPid,Alias).
 
 
 gameRoom(Game,Pid,Alias,0) ->
@@ -151,6 +147,14 @@ gameRoom(Game,Pid,Alias,0) ->
 gameRoom(Game,Pid,Alias,1) ->
     Game ! {input,Pid,Alias,io:get_line(Alias ++"> ")},
     gameRoom(Game,Pid,Alias,1).
+
+receiver(GameList,Num,Alias) ->
+    receive 
+	{message, Sender, Message} ->
+	    io:format("~n~s> ~s",[Sender,Message]);
+	{quit} -> game_menu(GameList,Num,Alias,GameList)
+    end,
+    receiver(GameList,Num,Alias).
 
 %% HELP FUNCTIONS %%
 
