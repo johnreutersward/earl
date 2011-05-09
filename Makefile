@@ -4,7 +4,9 @@ ERLC = erlc -W -o $(EBIN)
 SERVER = erl -sname server -connect_all false -setcookie earl_game_club -pa $(EBIN) -s server init
 CLIENT = erl -noshell -sname client -connect_all false -setcookie earl_game_club -pa $(EBIN) -s client init
 
-all:
+all:	build
+
+build:
 	@mkdir -p $(EBIN)
 	$(ERLC) $(SRC)/*.erl
 	@echo "All compiled"
