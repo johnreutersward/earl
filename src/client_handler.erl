@@ -77,7 +77,7 @@ game_menu([], Num,Alias,GameList) ->
 	    io:format("~w~n",[Input]),
 	    Temp = lists:nth(Input,GameList),
 	    TheGame = element(1,Temp),
-	    Pid = spawn(client_handler,gameRoom,[TheGame,self(),Alias,0]),
+	    spawn(client_handler,gameRoom,[TheGame,self(),Alias,0]),
 	    receive
 		{message, Sender, Message} ->
 		    io:format("~s says: ~s",[Alias,Message]);

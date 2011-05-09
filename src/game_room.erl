@@ -1,5 +1,5 @@
 -module(game_room).
--export([init/2, room/3, handleInput/3, commandParser/1, sendMessage/3, printPlayers/1]).
+-export([init/2, room/3, handleInput/5, commandParser/4, sendMessage/3, printPlayers/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 
@@ -24,38 +24,36 @@ room(Game, GameName, PlayerList) ->
 			srv ! {setStatus, Pid, Alias, [main]},
 			sendMessage(PlayerList, "", Alias++" has left the room.");
 		{input, Pid, Alias, Input} ->
-			spawn(handleInput, [self(), Input, Pid, Alias, PlayerList])
+			spawn(game_room,handleInput, [self(), Input, Pid, Alias, PlayerList])
 	end,
-	room(Game, GameName, PlayerList)
-.
+	room(Game, GameName, PlayerList).
 
 handleInput(RoomPid, Input, Pid, Alias, PlayerList) ->
 	if 
 		[hd(Input)] == "/" ->
-			Command = commandParser(Input, PlayerList);
+			Command = commandParser(Input,Pid,Alias, PlayerList);
 		true ->
-			{message, Input}
+			sendMessage(PlayerList,Alias,Input)
 	end
 	.
 commandParser([_, Input], Pid, Alias, PlayerList) ->
-	[Command | Params] = string:split(Input, " "),
-	case Command of
-		"challenge" ->
-			{challenge, Params},
-		"quit" ->
-			grm ! {quitPlayer, Pid, Alias},  
-		"players" ->
-			AliasList = lists:sort([X || {_, X, _} <- PlayerList]),	
-			printPlayers(AliasList);
-		_ ->
-			{invalid}
-	end
+    [Command | Params] = string:split(Input, " "),
+    case Command of
+	"challenge" ->
+	    {challenge, Params};
+	"quit" ->
+	    grm ! {quitPlayer, Pid, Alias};
+	"players" ->
+	    AliasList = lists:sort([X || {_, X, _} <- PlayerList]),	
+	    printPlayers(AliasList);
+	_ ->
+	    {invalid}
+    end.
 
 printPlayers([]) -> ok;
 printPlayers([Alias | AliasList]) ->
 		io:format("~w ", [Alias]),
 		printPlayers(AliasList).
-	.
 
 sendMessage([], Alias, Message) ->
 	ok;
