@@ -138,7 +138,7 @@ help(ClientPid,Alias) ->
     io:format("STATISTICS:~n",[]),
     io:format("Press 2 to get the information about the current users online.~n~n",[]),
     io:format("QUIT:~n",[]),
-    io:format("Press 4 to leave the server. You will then return to the directory you where in before you connected to Earl's Game Club.~n~n",[]),
+    io:format("Press 4 to leave the server.~nYou will then return to the directory you where in before you connected to Earl's Game Club.~n~n",[]),
     
     io:format("Press [ENTER] to go back to Main Menu~n", []),
 	getInput(),    
