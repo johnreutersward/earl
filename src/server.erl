@@ -18,7 +18,7 @@ init() ->
     register(db,spawn(database,init,[])),
 	spawnGameRooms([{glhf,"GLHF"},{tictactoe,"Tic Tac Toe"}]),
     io:format("-----------------------------------------------~n", []),
-    io:format("------  Earl Game Club server initiated  ------~n", []),
+    io:format("-----  Earl's Game Club server initiated  -----~n", []),
     io:format("-----------------------------------------------~n", []),
     io:format("         Host:   ~s~n", [net_adm:localhost()]),
     io:format("         Node:   ~s~n", [node()]),
