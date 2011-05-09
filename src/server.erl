@@ -15,7 +15,7 @@
 init() ->
     register(srv, self()),
     register(db,spawn(database,init,[])),
-	spawnGameRooms([]),
+	spawnGameRooms([{glhf,"GLHF"},{tictactoe,"Tic Tac Toe"}]),
     io:format("-----------------------------------------------~n", []),
     io:format("------  Earl Game Club server initiated  ------~n", []),
     io:format("-----------------------------------------------~n", []),
@@ -33,10 +33,14 @@ server() ->
 	{setStatus, Pid, Alias,Status} ->  
 	    io:format("Server: Received 'setStatus' request, forwarding to database~n", []),
 	    db ! {setStatus, Pid, Alias, Status};
-	{enterGameRoom, Pid, Alias, Game} ->
-		io:format("Server: Received 'enterGameRoom' request, forwarding to database~n", []),
-		db ! {setStatus, Pid, Alias, [game, Game]},
-		Game ! {newPlayer, Pid, Alias};
+	{enterGameRoom, Origin,Game} ->
+	    io:format("Server: Received 'enterGameRoom' request, forwarding to database~n", []),
+	    db ! {getAlias, Origin,self()},
+	    receive
+		{answer,Answer} -> 
+		    db ! {setStatus, Origin, Answer, [game, Game]}
+	    end,
+	    Game ! {newPlayer, Origin, Answer};
 	{checkAlias, Alias, Origin} -> 
 	    io:format("Server: Received 'checkAlias', forwarding to db~n", []),
 	    db ! {checkAlias, Alias, Origin};	       	      

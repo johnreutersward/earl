@@ -5,7 +5,6 @@
 %% @doc The Client module. This module allows a user to connect to Earl's Game Club
 %% and speak to that server with client functions.
 
-
 -module(client).
 -export([connect/0,wait/0, quit/0, runtest/0]).
 -export([init/0]).
