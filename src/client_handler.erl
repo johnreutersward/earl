@@ -145,14 +145,15 @@ gameRoom(Game,Pid,Alias,0) ->
     srv ! {enterGameRoom, Pid, Game},
     gameRoom(Game,Pid,Alias,1);
 gameRoom(Game,Pid,Alias,1) ->
-    Game ! {input,Pid,Alias,io:get_line(Alias ++"> ")},
+    Game ! {input,Pid,Alias,io:get_line("")},
     gameRoom(Game,Pid,Alias,1).
 
 receiver(GameList,Num,Alias) ->
     receive 
-	{message, Sender, Message} ->
-	    io:format("~n~s> ~s",[Sender,Message]);
-	{quit} -> game_menu(GameList,Num,Alias,GameList)
+		{message, Sender, Message} ->
+		    io:format("~n~s> ~s",[Sender,Message]);
+		{quit} -> 
+			game_menu(GameList,Num,Alias,GameList)
     end,
     receiver(GameList,Num,Alias).
 
