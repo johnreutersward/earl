@@ -7,7 +7,7 @@
 %% @doc this module contains all the functions that is related to the game room.
 
 -module(game_room).
--export([init/2, room/3, handleInput/5, commandParser/4, sendMessage/3, printPlayers/1]).
+-export([init/2, room/3, handleInput/6, commandParser/5, sendMessage/3, printPlayers/1, sendToClient/2]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the game room
@@ -36,7 +36,7 @@ room(Game, GameName, PlayerList) ->
 	    sendMessage(PlayerList, "", Alias++" has left the room.");
 	{input, Pid, Alias, Input} ->
 	    srv ! {debug, "Handle player input "++GameName++" room"},
-	    spawn(game_room,handleInput, [self(), Input, Pid, Alias, PlayerList]),
+	    spawn(game_room,handleInput, [self(), Input, Pid, Alias, PlayerList, Game]),
 	    NewPlayerList = PlayerList		
     end,
     room(Game, GameName, NewPlayerList).
@@ -44,27 +44,28 @@ room(Game, GameName, PlayerList) ->
 %% @doc handles the input depending on if it starts with "/" or not
 %% @hidden
 
-handleInput(RoomPid, Input, Pid, Alias, PlayerList) ->
+handleInput(RoomPid, Input, Pid, Alias, PlayerList, Game) ->
     if 
 	[hd(Input)] == "/" ->
-	    Command = commandParser(Input,Pid,Alias, PlayerList);
+	    commandParser(Input,Pid,Alias, PlayerList, Game);
 	true ->
-	    sendMessage(PlayerList,Alias,Input)
+	    spawn(game_room,sendMessage,[PlayerList,Alias,Input])
     end.
 
 %% @doc this function decides which command the user wants to input.
 %% @hidden
 	
-commandParser([_, Input], Pid, Alias, PlayerList) ->
-    [Command | Params] = string:split(Input, " "),
+commandParser([_ | Input], Pid, Alias, PlayerList, Game) ->
+    {Command,Params} = lists:splitwith(fun(A) -> A /= 32 end, Input),
     case Command of
 	"challenge" ->
 	    {challenge, Params};
 	"quit" ->
-	    grm ! {quitPlayer, Pid, Alias};
+	    Game ! {quitPlayer, Pid, Alias},
+	    Pid ! {back};
 	"players" ->
 	    AliasList = lists:sort([X || {_, X, _} <- PlayerList]),	
-	    printPlayers(AliasList);
+	    sendToClient(Pid, AliasList);
 	_ ->
 	    {invalid}
     end.
@@ -75,6 +76,7 @@ printPlayers([]) -> ok;
 printPlayers([Alias | AliasList]) ->
     io:format("~w ", [Alias]),
     printPlayers(AliasList).
+
 %% @doc sends a message to all the users in the game room.
 %% @hidden
 
@@ -83,8 +85,12 @@ sendMessage([], _, _) ->
 sendMessage([{H, User, _} | T], Alias, Message) ->
     if 
 	User == Alias ->
-	    sendMessage(T,Alias,Message);
+	    ok;
 	true ->
 	    H ! {message, Alias, Message}
     end,
     sendMessage(T, Alias, Message).
+
+sendToClient(Pid, Message) ->
+    Pid ! {directMessage, Message}.
+    

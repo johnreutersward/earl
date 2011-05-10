@@ -9,7 +9,7 @@
 %% and the server.
 
 -module(client_handler).
--export([init/1, create_alias/1, main_menu/2, game_menu/4, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2,receiver/3]).
+-export([init/1, create_alias/1, main_menu/2, game_menu/4, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2,receiver/3,printPlayers/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the client handler.
@@ -168,16 +168,30 @@ gameRoom(Game,Pid,Alias,1) ->
 receiver(GameList,Num,Alias) ->
     receive 
 		{message, Sender, Message} ->
-		    io:format("~n~s> ~s",[Sender,Message]);
-		{quit} -> 
-			game_menu(GameList,Num,Alias,GameList)
-    end,
-    receiver(GameList,Num,Alias).
+		    io:format("~n~s> ~s",[Sender,Message]),
+	            receiver(GameList,Num,Alias);
+		{back} -> 
+			ok;
+	        {directMessage, Message} ->
+	                printPlayers(Message),
+	                receiver(GameList,Num,Alias)
+    end.
+    
+
+
+printPlayers([]) -> ok;
+printPlayers([Alias | AliasList]) ->
+    io:format("~s ", [Alias]),
+    printPlayers(AliasList).
 
 %% HELP FUNCTIONS %%
+
+%% @hidden
 
 runtest() ->
     test(),
     init:stop().
+
+%% @hidden
 trim_test() ->
     ?assertEqual("Test", trim("    Test   \n")).
