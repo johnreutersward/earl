@@ -1,5 +1,7 @@
 %% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
 %% @author Andreas Hammar <andreashammar@gmail.com>
+%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
+%% @author Emma Rangert <emma.rangert@gmail.com>ß
 %% @author John Reuterswärd <rojters@gmail.com>
 %% @author Simon Young <youngen.simon@gmail.com>
 %% @doc This is the main server that handles all the communication between
@@ -63,13 +65,15 @@ server() ->
 
 %% @doc Spawns a game room for all games in a list
 %% @spec spawnGameRooms(List) -> ok
-
+%% @hidden
 spawnGameRooms([]) -> ok;
 spawnGameRooms([{GameModule, DisplayName}|T]) ->
 	register(GameModule, spawn(game_room, init, [GameModule, DisplayName])),
 	spawnGameRooms(T). 
 
 % Test cases
+
+%% @hidden
 
 runtest() ->
     test(),

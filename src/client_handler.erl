@@ -1,5 +1,7 @@
 %% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
 %% @author Andreas Hammar <andreashammar@gmail.com>
+%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
+%% @author Emma Rangert <emma.rangert@gmail.com>ß
 %% @author John Reuterswärd <rojters@gmail.com>
 %% @author Simon Young <youngen.simon@gmail.com>
 %% @doc This module has all the functions that the client needs on the server side.
@@ -20,6 +22,7 @@ init(ClientPid) ->
 
 %% @doc creates a user, when the client comes online.
 %% @spec create_alias(ClientPid) -> main_menu(ClientPid)
+%% @hidden
 
 create_alias(ClientPid) ->
     io:format("Input a Username: ", []),
@@ -91,6 +94,7 @@ game_menu([{_, DisplayName} | GameListIter], Num, Alias,GameList) ->
 
 %% @doc shows number of clients connected to the server.
 %% @spec numConnected() -> {getNumCluents,self()}
+%% @hidden
 
 numConnected() ->
     srv ! {getNumClients, self()},
@@ -101,12 +105,15 @@ numConnected() ->
 	    io:format("Failed to receive number of clients~n", [])
     end.
 %% @doc gets input from user.
-%% @spec getInput() -> trim(Input).
+%% @spec getInput() -> trim(Input)
+%% @hidden
 
 getInput() ->
     Input = io:get_line(""),
     trim(Input).
 
+%% @doc askes the user for an int.
+%% @hidden
 getNumber() ->
     case io_lib:fread("~d", getInput()) of
 	{ok, Num, _} -> hd(Num);
@@ -115,16 +122,21 @@ getNumber() ->
 
 
 %% @doc takes away "\n" from the string.
+%% @hidden
 
 trim(String) ->
     string:strip(string:strip(String, both, $\n)).
 %% @doc sends {quit,self()} to the server.
 %% @spec quit(ClientPid) -> {quit}
+%% @hidden
 
 quit(ClientPid) ->
     io:format("~nBye!~n",[]),
     srv ! {quit, self()},
     ClientPid ! {quit}. 
+
+%% @doc prints the help information.
+%% @hidden
 
 help(ClientPid,Alias) ->
     io:format("~n --Help-- ~n~n", []),
@@ -140,6 +152,8 @@ help(ClientPid,Alias) ->
     getInput(),    
     main_menu(ClientPid,Alias).
 
+%% @doc takes care of the input that the user gives to the game room.
+%% @hidden
 
 gameRoom(Game,Pid,Alias,0) ->
     srv ! {enterGameRoom, Pid, Game},
@@ -147,6 +161,9 @@ gameRoom(Game,Pid,Alias,0) ->
 gameRoom(Game,Pid,Alias,1) ->
     Game ! {input,Pid,Alias,io:get_line("")},
     gameRoom(Game,Pid,Alias,1).
+
+%% @doc a funtion that handles all the messages from the game room.
+%% @hidden
 
 receiver(GameList,Num,Alias) ->
     receive 

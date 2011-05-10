@@ -1,7 +1,17 @@
+%% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
+%% @author Andreas Hammar <andreashammar@gmail.com>
+%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
+%% @author Emma Rangert <emma.rangert@gmail.com>ß
+%% @author John Reuterswärd <rojters@gmail.com>
+%% @author Simon Young <youngen.simon@gmail.com>
+%% @doc this module contains all the functions that is related to the game room.
+
 -module(game_room).
 -export([init/2, room/3, handleInput/5, commandParser/4, sendMessage/3, printPlayers/1]).
 -include_lib("eunit/include/eunit.hrl").
 
+%% @doc initiates the game room
+%% @spec init(Game,GameName) -> room(Game,GAmeName,PlayerList)
 
 init(Game, GameName) ->
     srv ! {debug, "New game room spawned."},
@@ -11,6 +21,7 @@ init(Game, GameName) ->
 	    room(Game, GameName, PlayersList)
     end.
 	
+%% @doc the game room, it handles data between users.
 
 room(Game, GameName, PlayerList) ->
     receive
@@ -30,14 +41,20 @@ room(Game, GameName, PlayerList) ->
     end,
     room(Game, GameName, NewPlayerList).
 
+%% @doc handles the input depending on if it starts with "/" or not
+%% @hidden
+
 handleInput(RoomPid, Input, Pid, Alias, PlayerList) ->
     if 
 	[hd(Input)] == "/" ->
 	    Command = commandParser(Input,Pid,Alias, PlayerList);
 	true ->
 	    sendMessage(PlayerList,Alias,Input)
-    end
-	.
+    end.
+
+%% @doc this function decides which command the user wants to input.
+%% @hidden
+	
 commandParser([_, Input], Pid, Alias, PlayerList) ->
     [Command | Params] = string:split(Input, " "),
     case Command of
@@ -52,10 +69,14 @@ commandParser([_, Input], Pid, Alias, PlayerList) ->
 	    {invalid}
     end.
 
+%% @doc prints all the players in the game room
+
 printPlayers([]) -> ok;
 printPlayers([Alias | AliasList]) ->
     io:format("~w ", [Alias]),
     printPlayers(AliasList).
+%% @doc sends a message to all the users in the game room.
+%% @hidden
 
 sendMessage([], _, _) ->
     ok;

@@ -1,5 +1,7 @@
 %% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
 %% @author Andreas Hammar <andreashammar@gmail.com>
+%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
+%% @author Emma Rangert <emma.rangert@gmail.com>ß
 %% @author John Reuterswärd <rojters@gmail.com>
 %% @author Simon Young <youngen.simon@gmail.com>
 %% @doc this is the database that hold all the info of the clients currently
@@ -17,6 +19,7 @@ init() ->
     database().
 
 %% @doc the database.
+%% @spec database() -> database()
 
 database() ->
     receive
@@ -50,6 +53,7 @@ database() ->
     database().
 
 %% @doc Check if Alias is already in database, sends an answer to the asking process.
+%% @hidden
 
 checkAlias(Alias, Origin) ->
     srv ! {debug, "Database: Checking if alias '"++Alias++"' exists in client table"},
@@ -65,7 +69,8 @@ checkAlias(Alias, Origin) ->
     ok.
 
 %% @doc prints all the clints in the database.
-%% @spec printClients() -> {getAll,self()}
+%% @spec clients() -> printClients(ClientList)
+%% @hidden
 
 clients() ->
     db ! {getAll, self()},
@@ -73,6 +78,9 @@ clients() ->
 	ClientList -> 
 	    printClients(ClientList)
     end.
+
+%% @doc prints all the clients in the database
+%% @hidden
 
 printClients([]) ->
 	done;
@@ -91,7 +99,7 @@ printNumClients() ->
     end.
 
 %% @doc returns the alias that belongs to Pid
-%% @spec getAlias(Pid) -> Alias.
+%% @spec getAlias(Pid) -> Alias
 
 getAlias(Pid) ->
     ets:lookup_element(clientTable,Pid,2).

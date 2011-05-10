@@ -1,5 +1,7 @@
 %% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
 %% @author Andreas Hammar <andreashammar@gmail.com>
+%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
+%% @author Emma Rangert <emma.rangert@gmail.com>ß
 %% @author John Reuterswärd <rojters@gmail.com>
 %% @author Simon Young <youngen.simon@gmail.com>
 %% @doc The Client module. This module allows a user to connect to Earl's Game Club
@@ -39,6 +41,7 @@ connect() ->
     end.
 %% @doc Waits for {quit} message and then runs quit()
 %% @spec wait() -> quit()
+%% @hidden
 
 wait() ->
     receive
@@ -47,7 +50,7 @@ wait() ->
     end.
 
 %% @doc kills the program.
-
+%% @hidden
 quit() ->
     init:stop().
 
