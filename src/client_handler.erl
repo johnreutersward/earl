@@ -77,11 +77,11 @@ game_menu([], Num,Alias,GameList) ->
 	    io:format("Illegal command!~n", []),
 	    game_menu(GameList,1,Alias,GameList);
 	_ when Input > 0 , Input < Num ->
-	    io:format("~w~n",[Input]),
-	    Temp = lists:nth(Input,GameList),
-	    TheGame = element(1,Temp),
-	    spawn(client_handler,gameRoom,[TheGame,self(),Alias,0]),
-	    receiver(GameList,1,Alias);
+	    io:format("~w~n", [Input]),
+	    Temp = lists:nth(Input, GameList),
+	    TheGame = element(1, Temp),
+	    spawn(client_handler, gameRoom, [TheGame,self(),Alias,0]),
+	    receiver(GameList, 1, Alias);
 	_ when Input == Num ->
 	    ok;	
 	_ -> 
@@ -92,10 +92,43 @@ game_menu([{_, DisplayName} | GameListIter], Num, Alias,GameList) ->
     io:format("~p - ~s ~n", [Num, DisplayName]),
     game_menu(GameListIter, Num+1, Alias,GameList).
 
+
+gameRoom(Game, Pid, Alias, 0) ->
+    srv ! {enterGameRoom, Pid, Game},
+    gameRoom(Game, Pid, Alias, 1);
+gameRoom(Game, Pid, Alias,1) ->
+	Game ! {input, Pid, Alias, getInput()},
+    gameRoom(Game, Pid, Alias, 1).
+
+printPlayers([]) -> 
+	io:format("~n", []);
+printPlayers([Player | PlayerList]) ->
+    io:format("~s, ", [Player]),
+    printPlayers(PlayerList).
+
+quit(ClientPid) ->
+    io:format("~nBye!~n",[]),
+    srv ! {quit, self()},
+    ClientPid ! {quit}. 
+
+%% @doc a funtion that handles all the messages from the game room.
+%% @hidden
+
+receiver(GameList,Num,Alias) ->
+    receive 
+		{message, Sender, Message} ->
+		    io:format("~s> ~s~n",[Sender, Message]),
+            receiver(GameList, Num, Alias);
+		{back} -> 
+			ok;
+	    {printPlayers, PlayerList} ->
+	        printPlayers(PlayerList),
+	        receiver(GameList, Num, Alias)
+    end.
+    
 %% @doc shows number of clients connected to the server.
 %% @spec numConnected() -> {getNumCluents,self()}
 %% @hidden
-
 numConnected() ->
     srv ! {getNumClients, self()},
     receive
@@ -120,7 +153,6 @@ getNumber() ->
 	{error, _} -> error
     end.
 
-
 %% @doc takes away "\n" from the string.
 %% @hidden
 
@@ -129,11 +161,6 @@ trim(String) ->
 %% @doc sends {quit,self()} to the server.
 %% @spec quit(ClientPid) -> {quit}
 %% @hidden
-
-quit(ClientPid) ->
-    io:format("~nBye!~n",[]),
-    srv ! {quit, self()},
-    ClientPid ! {quit}. 
 
 %% @doc prints the help information.
 %% @hidden
@@ -152,42 +179,9 @@ help(ClientPid,Alias) ->
     getInput(),    
     main_menu(ClientPid,Alias).
 
-%% @doc takes care of the input that the user gives to the game room.
-%% @hidden
-
-gameRoom(Game, Pid, Alias, 0) ->
-    srv ! {enterGameRoom, Pid, Game},
-    gameRoom(Game, Pid, Alias, 1);
-gameRoom(Game, Pid, Alias,1) ->
-    Game ! {input, Pid, Alias, getInput()},
-    gameRoom(Game, Pid, Alias, 1).
-
-%% @doc a funtion that handles all the messages from the game room.
-%% @hidden
-
-receiver(GameList,Num,Alias) ->
-    receive 
-		{message, Sender, Message} ->
-		    io:format("~n~s> ~s",[Sender,Message]),
-	            receiver(GameList,Num,Alias);
-		{back} -> 
-			ok;
-	        {directMessage, Message} ->
-	                printPlayers(Message),
-	                receiver(GameList,Num,Alias)
-    end.
-    
-
-
-printPlayers([]) -> ok;
-printPlayers([Alias | AliasList]) ->
-    io:format("~s ", [Alias]),
-    printPlayers(AliasList).
-
 %% HELP FUNCTIONS %%
 
 %% @hidden
-
 runtest() ->
     test(),
     init:stop().

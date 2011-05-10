@@ -27,7 +27,8 @@ room(Game, GameName, PlayerList) ->
     receive
 	{newPlayer, Pid, Alias} ->
 	    srv ! {debug, "New player added to "++GameName++" room"},
-	    Pid ! {message, GameName, "Welcome to "++GameName++" game room!\n"},
+	    Pid ! {message, GameName, "Welcome to "++GameName++" game room!\n\n"
+								++"Available commands are: /players, /quit\n"},
 	    sendMessage(PlayerList, "", Alias++" has joined the room"),
 	    NewPlayerList = [{Pid, Alias, [game, Game]} | PlayerList];
 	{quitPlayer, Pid, Alias} ->
@@ -49,8 +50,9 @@ handleInput(RoomPid, Input, Pid, Alias, PlayerList, Game) ->
 	[hd(Input)] == "/" ->
 	    commandParser(Input,Pid,Alias, PlayerList, Game);
 	true ->
-	    spawn(game_room,sendMessage,[PlayerList,Alias,Input])
-    end.
+%	    spawn(game_room,sendMessage,[PlayerList,Alias,Input])
+    ok
+	end.
 
 %% @doc this function decides which command the user wants to input.
 %% @hidden
@@ -64,11 +66,12 @@ commandParser([_ | Input], Pid, Alias, PlayerList, Game) ->
 	    Game ! {quitPlayer, Pid, Alias},
 	    Pid ! {back};
 	"players" ->
-	    AliasList = lists:sort([X || {_, X, _} <- PlayerList]),	
-	    sendToClient(Pid, AliasList);
+		AliasList = lists:sort([X || {_, X, _} <- PlayerList]),	
+	    Pid ! {printPlayers, AliasList};
+%		sendToClient(Pid, AliasList);
 	_ ->
-	    {invalid}
-    end.
+		Pid ! {message, "", "Invalid Command."}
+	end.
 
 %% @doc prints all the players in the game room
 
@@ -93,4 +96,7 @@ sendMessage([{H, User, _} | T], Alias, Message) ->
 
 sendToClient(Pid, Message) ->
     Pid ! {directMessage, Message}.
-    
+
+trim(String) ->
+	string:strip(string:strip(String, both, $\n)).
+
