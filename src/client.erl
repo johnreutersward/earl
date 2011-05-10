@@ -55,6 +55,7 @@ quit() ->
     init:stop().
 
 %% TEST CASES %%
+%% @hidden
 
 runtest() ->
     test(),
