@@ -155,12 +155,12 @@ help(ClientPid,Alias) ->
 %% @doc takes care of the input that the user gives to the game room.
 %% @hidden
 
-gameRoom(Game,Pid,Alias,0) ->
+gameRoom(Game, Pid, Alias, 0) ->
     srv ! {enterGameRoom, Pid, Game},
-    gameRoom(Game,Pid,Alias,1);
-gameRoom(Game,Pid,Alias,1) ->
-    Game ! {input,Pid,Alias,io:get_line("")},
-    gameRoom(Game,Pid,Alias,1).
+    gameRoom(Game, Pid, Alias, 1);
+gameRoom(Game, Pid, Alias,1) ->
+    Game ! {input, Pid, Alias, getInput()},
+    gameRoom(Game, Pid, Alias, 1).
 
 %% @doc a funtion that handles all the messages from the game room.
 %% @hidden
