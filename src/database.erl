@@ -37,7 +37,7 @@ database() ->
 	    Origin ! {statusList, X};  
 	
 	{getNumClients, Origin} ->
-	    Origin ! ets:info(clientTable, size);
+		Origin ! {numClients, ets:info(clientTable, size)};
 	
 	{setStatus, Pid, Alias, Status} ->
 	    srv ! {debug, "Database: Setting status for "++Alias},

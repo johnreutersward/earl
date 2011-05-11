@@ -132,7 +132,7 @@ receiver(GameList,Num,Alias) ->
 numConnected() ->
     srv ! {getNumClients, self()},
     receive
-	NumClients ->
+		{numClients, NumClients} ->
 	    io:format("Number of clients connected: ~p~n", [NumClients])
     after 1000 ->
 	    io:format("Failed to receive number of clients~n", [])
