@@ -97,6 +97,3 @@ sendMessage([{H, User, _} | T], Alias, Message) ->
 sendToClient(Pid, Message) ->
     Pid ! {directMessage, Message}.
 
-trim(String) ->
-	string:strip(string:strip(String, both, $\n)).
-
