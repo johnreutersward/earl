@@ -1,8 +1,8 @@
 EBIN = ebin
 SRC = src
 ERLC = erlc -W -o $(EBIN)
-SERVER = erl -name server -connect_all false -pa $(EBIN) -s server init
-CLIENT = erl -noshell -name client -connect_all false -pa $(EBIN) -s client init
+SERVER = erl -sname server -connect_all false -pa $(EBIN) -s server init
+CLIENT = erl -noshell -sname client -connect_all false -pa $(EBIN) -s client init
 
 all:	build
 
