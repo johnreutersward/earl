@@ -48,7 +48,7 @@ server() ->
 	    io:format("Server: Received 'checkAlias', forwarding to db~n", []),
 	    db ! {checkAlias, Alias, Origin};	       	      
 	{quit, Pid} ->
-	    io:format("Server: Received 'quit' from pid, sending removal request to db~n", []),
+	    io:format("Server: Received 'quit' from ~w, sending removal request to db~n", [Pid]),
 	    db ! {remove,Pid};
 	{debug, Msg} ->
 	    io:format("~s~n", [Msg]);
