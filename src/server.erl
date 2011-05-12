@@ -18,7 +18,10 @@ init() ->
 	erlang:set_cookie(node(), earl_game_club),
 	register(srv, self()),
     register(db,spawn(database,init,[])),
-	spawnGameRooms([{glhf,"GLHF"},{tictactoe,"Tic Tac Toe"}]),
+	GamesList = loadGamesList(),
+%	spawnGameRooms([{glhf, "GLHF"}, {tictactoe, "Tic Tac Toe"}]),
+	spawnGameRooms(GamesList),
+	db ! {setGamesList, GamesList},
     io:format("-----------------------------------------------~n", []),
     io:format("-----  Earl's Game Club server initiated  -----~n", []),
     io:format("-----------------------------------------------~n", []),
@@ -61,7 +64,26 @@ server() ->
     end,
     server().
 
-%% HELP FUNCTIONS %%
+loadGamesList() ->
+	case file:open("games.ini", read) of
+		{ok, Device} ->
+			readLines(Device, []);
+		{error, Reason} ->
+			{error, Reason}
+	end.
+readLines(File, Games) ->
+	case io:get_line(File, "") of
+		eof ->
+			Games;
+		Line ->
+			[GameString | T] = string:tokens(Line, "\t\n"),
+			[GameName | _] = T,
+			Game = list_to_atom(GameString),
+
+			io:format("Game: ~w - ~s loaded.~n", [Game, GameName]),
+			readLines(File, [{Game, GameName} | Games])
+	end.
+
 
 %% @doc Spawns a game room for all games in a list
 %% @spec spawnGameRooms(List) -> ok
@@ -70,6 +92,8 @@ spawnGameRooms([]) -> ok;
 spawnGameRooms([{GameModule, DisplayName}|T]) ->
 	register(GameModule, spawn(game_room, init, [GameModule, DisplayName])),
 	spawnGameRooms(T). 
+
+
 
 % Test cases
 
