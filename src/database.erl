@@ -50,11 +50,11 @@ database() ->
 	{remove,Pid} ->
 	    srv ! {debug, "Database: Removing client from client table"},
 	    ets:delete(clientTable,Pid);
-	
+
+
 	{getGame, GameModule, Origin} ->
 		srv ! {debug, "Database: Returning game information"},
 		Origin ! {gameInfo, ets:lookup(gamesTable, GameModule)};
-
 
 	{setGamesList, List} ->
 	    srv ! {debug, "Database: Setting Games Table."},
