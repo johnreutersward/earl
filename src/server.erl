@@ -16,12 +16,6 @@
 
 init() ->
     erlang:set_cookie(node(), earl_game_club),
-    register(srv, self()),
-    register(db,spawn(database,init,[])),
-    LoadList = loadGamesList(),
-%	spawnGameRooms([{glhf, "GLHF"}, {tictactoe, "Tic Tac Toe"}]),
-    GameList = spawnGameRooms(LoadList,[]),
-    db ! {setGamesList, GameList},
     io:format("-----------------------------------------------~n", []),
     io:format("-----  Earl's Game Club server initiated  -----~n", []),
     io:format("-----------------------------------------------~n", []),
@@ -29,6 +23,12 @@ init() ->
     io:format("         Node:   ~s~n", [node()]),
     io:format("         Cookie: ~s~n", [erlang:get_cookie()]),
     io:format("-----------------------------------------------~n~n", []),
+    
+	register(srv, self()),
+    register(db,spawn(database,init,[])),
+    LoadList = loadGamesList(),
+    GameList = spawnGameRooms(LoadList,[]),
+    db ! {setGamesList, GameList},
     server().
 
 %% @doc receives messages and realays them to the db or start other processes to handle the
@@ -43,13 +43,13 @@ server() ->
 	    io:format("Server: Received 'enterGameRoom' request, forwarding to database~n", []),
 	    db ! {getAlias, Origin,self()},
 	    receive
-		{answer,Answer} -> 
-		    db ! {setStatus, Origin, Answer, [game, element(1,Game)]}
+		{alias, Alias} -> 
+		    db ! {setStatus, Origin, Alias, [game, element(1,Game)]}
 	    end,
-	    element(3,Game) ! {newPlayer, Origin, Answer};
+	    element(3,Game) ! {newPlayer, Origin, Alias};
 	{checkAlias, Alias, Origin} -> 
 	    io:format("Server: Received 'checkAlias', forwarding to db~n", []),
-	    db ! {checkAlias, Alias, Origin};	       	      
+	    db ! {checkAlias, Alias, Origin};
 	{quit, Pid} ->
 	    io:format("Server: Received 'quit' from ~w, sending removal request to db~n", [Pid]),
 	    db ! {remove,Pid};
@@ -92,8 +92,6 @@ spawnGameRooms([],GameList) -> GameList;
 spawnGameRooms([{GameModule, DisplayName}|T],GameList) ->
     Pid = spawn(game_room, init, [GameModule, DisplayName]),
     spawnGameRooms(T,[{GameModule,DisplayName,Pid} | GameList]). 
-
-
 
 % Test cases
 

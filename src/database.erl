@@ -31,7 +31,7 @@ database() ->
 	    X = ets:lookup(clientTable,Pid),
 	    Origin ! X;
 	{getAlias,Pid,Origin} ->
-	    Origin ! {answer,getAlias(Pid)};
+	    Origin ! {alias, ets:lookup_element(clientTable,Pid,2)};
 	
 	{getSameStatus, Status, Origin} ->
 	    X = ets:match(clientTable, {'$1', '$2', Status}),
@@ -114,8 +114,3 @@ printNumClients() ->
 	    io:format("~p~n", Num)
     end.
 
-%% @doc returns the alias that belongs to Pid
-%% @spec getAlias(Pid) -> Alias
-
-getAlias(Pid) ->
-    ets:lookup_element(clientTable,Pid,2).
