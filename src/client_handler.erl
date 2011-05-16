@@ -30,7 +30,7 @@ create_alias(ClientPid) ->
     srv ! {checkAlias, Alias, self()},
     io:format("Handler: Waiting for server confirmation~n", []),
     receive
-	aliasValid -> 
+		{aliasValid} ->	
 	    srv ! {setStatus, self(), Alias, [main]},
 	    main_menu(ClientPid,Alias);
         aliasInvalid -> 
