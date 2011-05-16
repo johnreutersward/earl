@@ -2,23 +2,22 @@
 %% @doc A supervisor that messages the client_handler if a client dies.
 
 -module(client_supervisor).
--export([init/1, loop/1]).
+-export([init/2, trap/2]).
 
 %% @doc Initiates the client_supervisor.
 %% @spec init() -> ok
 
-init(ClientHandler) -> 
+init(ServerPid, ClientHandlerPid) -> 
 	io:format("Starting...~n"),
-	link(ClientHandler),
+	link(ClientHandlerPid),
 	process_flag(trap_exit, true),
-	loop(ClientHandler).
+	trap(ServerPid,ClientHandlerPid).
 
-%% @doc Notifies the client_handler if a client dies.
+%% @doc Notifies the server if a client dies.
 %% @spec loop() -> ok
 
-loop(ClientHandler) ->
+trap(ServerPid,ClientHandlerPid) ->
 	receive
 	{'EXIT', _Pid, _Reason} -> 
-			    ClientHandler ! {quit},
-			    init:stop()
+			    ServerPid ! {quit, ClientHandlerPid}
 	end.

@@ -45,7 +45,8 @@ server() ->
 	    GameRoomPid ! {newPlayer, Origin, Alias};
 	{checkAlias, Alias, Origin} -> 
 	    io:format("Server: Received 'checkAlias', forwarding to db~n", []),
-	    db ! {checkAlias, Alias, Origin};
+		spawn(client_supervisor, init, [self(), Origin]),
+		db ! {checkAlias, Alias, Origin};
 	{quit, Pid} ->
 	    io:format("Server: Received 'quit' from ~w, sending removal request to db~n", [Pid]),
 	    db ! {remove,Pid};

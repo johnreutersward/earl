@@ -9,7 +9,7 @@
 %% and the server.
 
 -module(client_handler).
--export([init/1, create_alias/1, main_menu/2, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2,receiver/3,printPlayers/1, ping/2]).
+-export([init/1, create_alias/1, main_menu/2, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2,receiver/3,printPlayers/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the client handler.
@@ -30,8 +30,7 @@ create_alias(ClientPid) ->
     srv ! {checkAlias, Alias, self()},
     io:format("Handler: Waiting for server confirmation~n", []),
     receive
-		{aliasValid, DBPid} ->
-		DBPid ! {clientPid, ClientPid},	
+		{aliasValid} ->	
 	    srv ! {setStatus, self(), Alias, [main]},
 	    main_menu(ClientPid,Alias);
         aliasInvalid -> 
@@ -86,8 +85,15 @@ game_menu([], Num, Alias, GameList) ->
 	    io:format("~w~n", [Input]),
 	    Game = lists:nth(Input, GameList),
 	    GameRoomInputPid = spawn(client_handler, gameRoom, [Game, self(), Alias, 0]),
-	    receiver(GameList, 1, Alias),
-	    exit(GameRoomInputPid,kill);
+	    State = receiver(GameList, 1, Alias),
+	    exit(GameRoomInputPid, kill),
+	    case State of 
+		{game, GamePid} ->
+		    gameMode(GamePid);
+		_ -> 
+		    ok
+	    end;
+	    
 	_ when Input == Num ->
 	    ok;	
 	_ -> 
@@ -122,12 +128,14 @@ quit(ClientPid) ->
 %% @hidden
 
 receiver(GameList,Num,Alias) ->
-	receive 
+    receive 
 	{message, Sender, Message} ->
 	    io:format("~s> ~s~n",[Sender, Message]),
-        receiver(GameList, Num, Alias);
+	    receiver(GameList, Num, Alias);
 	{back} -> 
 	    ok;
+	{game, GamePid} ->
+	    {game, GamePid};
 	{printPlayers, PlayerList} ->
 	    printPlayers(PlayerList),
 	    receiver(GameList, Num, Alias)
@@ -186,19 +194,16 @@ help(ClientPid,Alias) ->
     getInput(),    
     main_menu(ClientPid,Alias).
 
-%% @doc Sends a ping message to the client every 30 sec. If the client doesn't respond within another 10 sec the server is notified that the client has died.
-%% @spec ping() -> ok.
-
-ping(ClientHandler, Client) ->
-	timer:sleep(3000),
-	Client ! {ping, self()},
-	receive
-		{pong} ->
-			ping(ClientHandler, Client)
-	after 10000 ->
-		srv ! {quit, ClientHandler},
-		exit(ClientHandler, kill)
-	end.
+gameMode(GamePid) ->
+    receive
+	{output, Message} ->
+	    io:format("~s~n", [Message]);
+	{input} ->
+	    GamePid ! {input, getInput()};
+	{finish} ->
+	    ok
+    end.
+    
 
 %% HELP FUNCTIONS %%
 
