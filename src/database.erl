@@ -15,7 +15,8 @@
 %% @spec init() -> database()
 
 init() ->
-    ets:new(clientTable,[set,named_table]),
+    ets:new(clientTable, [set,named_table]),
+	ets:new(gamesTable, [set, named_table]),
     database().
 
 %% @doc the database.
@@ -37,7 +38,7 @@ database() ->
 	    Origin ! {statusList, X};  
 	
 	{getNumClients, Origin} ->
-	    Origin ! ets:info(clientTable, size);
+		Origin ! {numClients, ets:info(clientTable, size)};
 	
 	{setStatus, Pid, Alias, Status} ->
 	    srv ! {debug, "Database: Setting status for "++Alias},
@@ -48,7 +49,17 @@ database() ->
 	
 	{remove,Pid} ->
 	    srv ! {debug, "Database: Removing client from client table"},
-	    ets:delete(clientTable,Pid)
+	    ets:delete(clientTable,Pid);
+	
+	{setGamesList, List} ->
+		srv ! {debug, "Database: Setting Games Table."},
+		ets:delete_all_objects(gamesTable),
+		ets:insert(gamesTable, List);
+
+	{getGamesList, Origin} ->
+		srv ! {debug, "Database: Returning list of games to clienthandler"},
+		Origin ! {gamesList, ets:tab2list(gamesTable)}
+
     end,
     database().
 
