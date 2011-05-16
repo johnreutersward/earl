@@ -1,7 +1,7 @@
 %% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
 %% @author Andreas Hammar <andreashammar@gmail.com>
 %% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
-%% @author Emma Rangert <emma.rangert@gmail.com>ß
+%% @author Emma Rangert <emma.rangert@gmail.com>
 %% @author John Reuterswärd <rojters@gmail.com>
 %% @author Simon Young <youngen.simon@gmail.com>
 %% @doc The Client module. This module allows a user to connect to Earl's Game Club
@@ -17,8 +17,8 @@
 %% @spec init() -> connect()
 	     
 init() ->
-	erlang:set_cookie(node(), earl_game_club),
-	io:format("~n---------------------------------------~n", []),
+    erlang:set_cookie(node(), earl_game_club),
+    io:format("~n---------------------------------------~n", []),
     io:format("------  Earl's Game Club client  ------~n", []),
     io:format("---------------------------------------~n", []),
     connect().

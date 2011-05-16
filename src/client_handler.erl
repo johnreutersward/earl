@@ -1,7 +1,7 @@
 %% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
 %% @author Andreas Hammar <andreashammar@gmail.com>
 %% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
-%% @author Emma Rangert <emma.rangert@gmail.com>ß
+%% @author Emma Rangert <emma.rangert@gmail.com>
 %% @author John Reuterswärd <rojters@gmail.com>
 %% @author Simon Young <youngen.simon@gmail.com>
 %% @doc This module has all the functions that the client needs on the server side.
@@ -78,23 +78,22 @@ game_menu([], Num, Alias, GameList) ->
     io:format(IntString ++ " - Back to Main Menu~n?> ", []),
     Input = getNumber(), 
     case(Input) of
-		error ->
-		    io:format("Illegal command!~n", []),
-		    game_menu(Alias);
-		_ when Input > 0 , Input < Num ->
-		    io:format("~w~n", [Input]),
-		    Temp = lists:nth(Input, GameList),
-		    TheGame = element(1, Temp),
-		    spawn(client_handler, gameRoom, [TheGame, self(), Alias, 0]),
-		    receiver(GameList, 1, Alias);
-		_ when Input == Num ->
-		    ok;	
-		_ -> 
-		    io:format("Illegal command!~n", []),
-		    game_menu(GameList, 1, Alias,GameList)
+	error ->
+	    io:format("Illegal command!~n", []),
+	    game_menu(Alias);
+	_ when Input > 0 , Input < Num ->
+	    io:format("~w~n", [Input]),
+	    Game = lists:nth(Input, GameList),
+	    spawn(client_handler, gameRoom, [Game, self(), Alias, 0]),
+	    receiver(GameList, 1, Alias);
+	_ when Input == Num ->
+	    ok;	
+	_ -> 
+	    io:format("Illegal command!~n", []),
+	    game_menu(GameList, 1, Alias,GameList)
     end;
 
-game_menu([{_, DisplayName} | GameListIter], Num, Alias, GameList) ->
+game_menu([{_, DisplayName,_} | GameListIter], Num, Alias, GameList) ->
     io:format("~p - ~s ~n", [Num, DisplayName]),
     game_menu(GameListIter, Num+1, Alias,GameList).
 
@@ -103,7 +102,7 @@ gameRoom(Game, Pid, Alias, 0) ->
     srv ! {enterGameRoom, Pid, Game},
     gameRoom(Game, Pid, Alias, 1);
 gameRoom(Game, Pid, Alias,1) ->
-	Game ! {input, Pid, Alias, getInput()},
+	element(3,Game) ! {input, Pid, Alias, getInput()},
     gameRoom(Game, Pid, Alias, 1).
 
 printPlayers([]) -> 
@@ -122,23 +121,23 @@ quit(ClientPid) ->
 
 receiver(GameList,Num,Alias) ->
     receive 
-		{message, Sender, Message} ->
-		    io:format("~s> ~s~n",[Sender, Message]),
+	{message, Sender, Message} ->
+	    io:format("~s> ~s~n",[Sender, Message]),
             receiver(GameList, Num, Alias);
-		{back} -> 
-			ok;
-	    {printPlayers, PlayerList} ->
-	        printPlayers(PlayerList),
-	        receiver(GameList, Num, Alias)
+	{back} -> 
+	    ok;
+	{printPlayers, PlayerList} ->
+	    printPlayers(PlayerList),
+	    receiver(GameList, Num, Alias)
     end.
-    
+
 %% @doc shows number of clients connected to the server.
 %% @spec numConnected() -> {getNumCluents,self()}
 %% @hidden
 numConnected() ->
     srv ! {getNumClients, self()},
     receive
-		{numClients, NumClients} ->
+	{numClients, NumClients} ->
 	    io:format("Number of clients connected: ~p~n", [NumClients])
     after 1000 ->
 	    io:format("Failed to receive number of clients~n", [])

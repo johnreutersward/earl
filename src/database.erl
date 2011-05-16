@@ -1,7 +1,7 @@
 %% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
 %% @author Andreas Hammar <andreashammar@gmail.com>
 %% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
-%% @author Emma Rangert <emma.rangert@gmail.com>ß
+%% @author Emma Rangert <emma.rangert@gmail.com>
 %% @author John Reuterswärd <rojters@gmail.com>
 %% @author Simon Young <youngen.simon@gmail.com>
 %% @doc this is the database that hold all the info of the clients currently
@@ -16,7 +16,7 @@
 
 init() ->
     ets:new(clientTable, [set,named_table]),
-	ets:new(gamesTable, [set, named_table]),
+    ets:new(gamesTable, [set, named_table]),
     database().
 
 %% @doc the database.
@@ -38,7 +38,7 @@ database() ->
 	    Origin ! {statusList, X};  
 	
 	{getNumClients, Origin} ->
-		Origin ! {numClients, ets:info(clientTable, size)};
+	    Origin ! {numClients, ets:info(clientTable, size)};
 	
 	{setStatus, Pid, Alias, Status} ->
 	    srv ! {debug, "Database: Setting status for "++Alias},
@@ -52,14 +52,14 @@ database() ->
 	    ets:delete(clientTable,Pid);
 	
 	{setGamesList, List} ->
-		srv ! {debug, "Database: Setting Games Table."},
-		ets:delete_all_objects(gamesTable),
-		ets:insert(gamesTable, List);
-
+	    srv ! {debug, "Database: Setting Games Table."},
+	    ets:delete_all_objects(gamesTable),
+	    ets:insert(gamesTable, List);
+	
 	{getGamesList, Origin} ->
-		srv ! {debug, "Database: Returning list of games to clienthandler"},
-		Origin ! {gamesList, ets:tab2list(gamesTable)}
-
+	    srv ! {debug, "Database: Returning list of games to clienthandler"},
+	    Origin ! {gamesList, ets:tab2list(gamesTable)}
+		
     end,
     database().
 
@@ -94,10 +94,10 @@ clients() ->
 %% @hidden
 
 printClients([]) ->
-	done;
+    done;
 printClients([{Pid, Alias, Status} | T]) ->
-	io:format("{~w, ~s, ~w}~n", [Pid, Alias, Status]),
-	printClients(T).
+    io:format("{~w, ~s, ~w}~n", [Pid, Alias, Status]),
+    printClients(T).
 
 %% @doc prints the number of clients currently online.
 %% @spec printNumClients() -> {getNumClients, self()}
