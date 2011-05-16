@@ -39,14 +39,10 @@ server() ->
 	{setStatus, Pid, Alias,Status} ->  
 	    io:format("Server: Received 'setStatus' request, forwarding to database~n", []),
 	    db ! {setStatus, Pid, Alias, Status};
-	{enterGameRoom, Origin,Game} ->
+	{enterGameRoom, Alias, Origin, {GameModule, _, GameRoomPid}} ->
 	    io:format("Server: Received 'enterGameRoom' request, forwarding to database~n", []),
-	    db ! {getAlias, Origin,self()},
-	    receive
-		{alias, Alias} -> 
-		    db ! {setStatus, Origin, Alias, [game, element(1,Game)]}
-	    end,
-	    element(3,Game) ! {newPlayer, Origin, Alias};
+		db ! {setStatus, Origin, Alias, [game, GameModule]},
+	    GameRoomPid ! {newPlayer, Origin, Alias};
 	{checkAlias, Alias, Origin} -> 
 	    io:format("Server: Received 'checkAlias', forwarding to db~n", []),
 	    db ! {checkAlias, Alias, Origin};
@@ -63,6 +59,13 @@ server() ->
 	    db ! {getSameStatus, Status, Origin}
     end,
     server().
+
+getGame(GameModule) ->
+	db ! {getGame, GameModule, self()},
+	receive
+		{gameInfo, Game} ->
+			Game
+	end.
 
 loadGamesList() ->
     case file:open("games.ini", read) of

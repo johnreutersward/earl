@@ -98,12 +98,12 @@ game_menu([{_, DisplayName,_} | GameListIter], Num, Alias, GameList) ->
     game_menu(GameListIter, Num+1, Alias,GameList).
 
 
-gameRoom(Game, Pid, Alias, 0) ->
-    srv ! {enterGameRoom, Pid, Game},
-    gameRoom(Game, Pid, Alias, 1);
-gameRoom(Game, Pid, Alias,1) ->
-	element(3,Game) ! {input, Pid, Alias, getInput()},
-    gameRoom(Game, Pid, Alias, 1).
+gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias, 0) ->
+    srv ! {enterGameRoom, Alias, ClientPid, {GameModule, GameName, RoomPid}},
+    gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias, 1);
+gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias,1) ->
+	RoomPid ! {input, ClientPid, Alias, getInput()},
+    gameRoom({GameModule, GameName, RoomPid}, RoomPid, Alias, 1).
 
 printPlayers([]) -> 
 	io:format("~n", []);
@@ -120,7 +120,7 @@ quit(ClientPid) ->
 %% @hidden
 
 receiver(GameList,Num,Alias) ->
-    receive 
+	receive 
 	{message, Sender, Message} ->
 	    io:format("~s> ~s~n",[Sender, Message]),
             receiver(GameList, Num, Alias);
