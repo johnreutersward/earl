@@ -84,8 +84,9 @@ game_menu([], Num, Alias, GameList) ->
 	_ when Input > 0 , Input < Num ->
 	    io:format("~w~n", [Input]),
 	    Game = lists:nth(Input, GameList),
-	    spawn(client_handler, gameRoom, [Game, self(), Alias, 0]),
-	    receiver(GameList, 1, Alias);
+	    GameRoomInputPid = spawn(client_handler, gameRoom, [Game, self(), Alias, 0]),
+	    receiver(GameList, 1, Alias),
+	    exit(GameRoomInputPid,kill);
 	_ when Input == Num ->
 	    ok;	
 	_ -> 
@@ -102,7 +103,7 @@ gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias, 0) ->
     srv ! {enterGameRoom, Alias, ClientPid, {GameModule, GameName, RoomPid}},
     gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias, 1);
 gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias,1) ->
-	RoomPid ! {input, ClientPid, Alias, getInput()},
+    RoomPid ! {input, ClientPid, Alias, getInput()},
     gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias, 1).
 
 printPlayers([]) -> 
@@ -120,13 +121,11 @@ quit(ClientPid) ->
 %% @hidden
 
 receiver(GameList,Num,Alias) ->
-	io:format("Client: waiting for receive", []),
 	receive 
 	{message, Sender, Message} ->
 	    io:format("~s> ~s~n",[Sender, Message]),
         receiver(GameList, Num, Alias);
 	{back} -> 
-		io:format("Client, quit received", []),
 	    ok;
 	{printPlayers, PlayerList} ->
 	    printPlayers(PlayerList),

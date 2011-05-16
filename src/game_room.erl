@@ -64,8 +64,7 @@ commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList, Game) ->
 	"challenge" ->
 	    {challenge, Params};
 	"quit" ->
-	    RoomPid ! {quitPlayer, Origin, Alias},
-		io:format("Quit origin: ~w~n",[Origin]);
+	    RoomPid ! {quitPlayer, Origin, Alias};
 	"players" ->
 	    AliasList = lists:sort([X || {_, X, _} <- PlayerList]),	
 	    Origin ! {printPlayers, AliasList};
