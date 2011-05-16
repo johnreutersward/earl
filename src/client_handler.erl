@@ -9,7 +9,7 @@
 %% and the server.
 
 -module(client_handler).
--export([init/1, create_alias/1, main_menu/2, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2,receiver/3,printPlayers/1, ping/2]).
+-export([init/1, create_alias/1, main_menu/2, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2,receiver/3,printPlayers/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the client handler.
@@ -30,8 +30,7 @@ create_alias(ClientPid) ->
     srv ! {checkAlias, Alias, self()},
     io:format("Handler: Waiting for server confirmation~n", []),
     receive
-		{aliasValid, DBPid} ->
-		DBPid ! {clientPid, ClientPid},	
+		{aliasValid} ->	
 	    srv ! {setStatus, self(), Alias, [main]},
 	    main_menu(ClientPid,Alias);
         aliasInvalid -> 
@@ -185,20 +184,6 @@ help(ClientPid,Alias) ->
     io:format("Press [ENTER] to go back to Main Menu~n", []),
     getInput(),    
     main_menu(ClientPid,Alias).
-
-%% @doc Sends a ping message to the client every 30 sec. If the client doesn't respond within another 10 sec the server is notified that the client has died.
-%% @spec ping() -> ok.
-
-ping(ClientHandler, Client) ->
-	timer:sleep(3000),
-	Client ! {ping, self()},
-	receive
-		{pong} ->
-			ping(ClientHandler, Client)
-	after 10000 ->
-		srv ! {quit, ClientHandler},
-		exit(ClientHandler, kill)
-	end.
 
 %% HELP FUNCTIONS %%
 
