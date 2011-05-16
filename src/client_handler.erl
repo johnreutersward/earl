@@ -85,8 +85,15 @@ game_menu([], Num, Alias, GameList) ->
 	    io:format("~w~n", [Input]),
 	    Game = lists:nth(Input, GameList),
 	    GameRoomInputPid = spawn(client_handler, gameRoom, [Game, self(), Alias, 0]),
-	    receiver(GameList, 1, Alias),
-	    exit(GameRoomInputPid,kill);
+	    State = receiver(GameList, 1, Alias),
+	    exit(GameRoomInputPid, kill),
+	    case State of 
+		{game, GamePid} ->
+		    gameMode(GamePid);
+		_ -> 
+		    ok
+	    end;
+	    
 	_ when Input == Num ->
 	    ok;	
 	_ -> 
@@ -121,12 +128,14 @@ quit(ClientPid) ->
 %% @hidden
 
 receiver(GameList,Num,Alias) ->
-	receive 
+    receive 
 	{message, Sender, Message} ->
 	    io:format("~s> ~s~n",[Sender, Message]),
-        receiver(GameList, Num, Alias);
+	    receiver(GameList, Num, Alias);
 	{back} -> 
 	    ok;
+	{game, GamePid} ->
+	    {game, GamePid};
 	{printPlayers, PlayerList} ->
 	    printPlayers(PlayerList),
 	    receiver(GameList, Num, Alias)
@@ -184,6 +193,17 @@ help(ClientPid,Alias) ->
     io:format("Press [ENTER] to go back to Main Menu~n", []),
     getInput(),    
     main_menu(ClientPid,Alias).
+
+gameMode(GamePid) ->
+    receive
+	{output, Message} ->
+	    io:format("~s~n", [Message]);
+	{input} ->
+	    GamePid ! {input, getInput()};
+	{finish} ->
+	    ok
+    end.
+    
 
 %% HELP FUNCTIONS %%
 
