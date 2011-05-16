@@ -39,7 +39,9 @@ room(Game, GameName, PlayerList) ->
 	{input, Origin, Alias, Input} ->
 	    srv ! {debug, "Handle player input "++GameName++" room"},
 	    spawn(game_room,handleInput, [self(), Input, Origin, Alias, PlayerList, Game]),
-	    NewPlayerList = PlayerList		
+	    NewPlayerList = PlayerList	
+%%	{challange, Aliases, Origin} ->
+	   
     end,
     room(Game, GameName, NewPlayerList).
 
@@ -59,10 +61,10 @@ handleInput(RoomPid, Input, Origin, Alias, PlayerList, Game) ->
 %% @hidden
 	
 commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList, Game) ->
-    {Command,Params} = lists:splitwith(fun(A) -> A /= 32 end, Input),
+    [Command | Params] = string:tokens(Input, " "),
     case Command of
 	"challenge" ->
-	    {challenge, Params};
+	   RoomPid ! {challenge, Params, Origin}; 
 	"quit" ->
 	    RoomPid ! {quitPlayer, Origin, Alias};
 	"players" ->
