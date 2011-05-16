@@ -72,9 +72,15 @@ checkAlias(Alias, Origin) ->
     if
 	Answer == [] -> 
 	    srv ! {debug, "Database: Alias '"++Alias++"' does not exist in client table, returning valid"},
-	    Origin ! aliasValid;
+		Origin ! {aliasValid, self()},
+		receive
+			{clientPid, ClientPid} ->
+				spawn(client_handler, ping, [Origin, ClientPid])
+		after 10000 ->
+				srv ! {debug, "Database: Failed to recieve clientPid from Client Handler."}
+		end;
 	true -> 
-	    srv ! {debug, "Database: Alias '"++Alias++"' already exists in client table"},
+	    srv ! {debug, "Database: Alias '"++Alias++"' alreandy exists in client table"},
 	    Origin ! aliasInvalid 
     end, 
     ok.

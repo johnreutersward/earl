@@ -46,7 +46,10 @@ connect() ->
 wait() ->
     receive
 	{quit} ->
-	    quit()
+	    quit();
+	{ping, PID} ->
+		PID ! {pong},
+		wait()
     end.
 
 %% @doc kills the program.
