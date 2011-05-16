@@ -31,7 +31,7 @@ database() ->
 	    X = ets:lookup(clientTable,Pid),
 	    Origin ! X;
 	{getAlias,Pid,Origin} ->
-	    Origin ! {answer,getAlias(Pid)};
+	    Origin ! {alias, ets:lookup_element(clientTable,Pid,2)};
 	
 	{getSameStatus, Status, Origin} ->
 	    X = ets:match(clientTable, {'$1', '$2', Status}),
@@ -50,7 +50,12 @@ database() ->
 	{remove,Pid} ->
 	    srv ! {debug, "Database: Removing client from client table"},
 	    ets:delete(clientTable,Pid);
-	
+
+
+	{getGame, GameModule, Origin} ->
+		srv ! {debug, "Database: Returning game information"},
+		Origin ! {gameInfo, ets:lookup(gamesTable, GameModule)};
+
 	{setGamesList, List} ->
 	    srv ! {debug, "Database: Setting Games Table."},
 	    ets:delete_all_objects(gamesTable),
@@ -115,8 +120,3 @@ printNumClients() ->
 	    io:format("~p~n", Num)
     end.
 
-%% @doc returns the alias that belongs to Pid
-%% @spec getAlias(Pid) -> Alias
-
-getAlias(Pid) ->
-    ets:lookup_element(clientTable,Pid,2).

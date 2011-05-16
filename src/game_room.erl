@@ -33,6 +33,7 @@ room(Game, GameName, PlayerList) ->
 	    NewPlayerList = [{Pid, Alias, [game, Game]} | PlayerList];
 	{quitPlayer, Pid, Alias} ->
 	    NewPlayerList = lists:keydelete(Pid, 1, PlayerList),
+	    Pid ! {back},
 	    srv ! {setStatus, Pid, Alias, [main]},
 	    sendMessage(PlayerList, "", Alias++" has left the room.");
 	{input, Origin, Alias, Input} ->
@@ -63,8 +64,7 @@ commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList, Game) ->
 	"challenge" ->
 	    {challenge, Params};
 	"quit" ->
-	    RoomPid ! {quitPlayer, Origin, Alias},
-	    Origin ! {back};
+	    RoomPid ! {quitPlayer, Origin, Alias};
 	"players" ->
 	    AliasList = lists:sort([X || {_, X, _} <- PlayerList]),	
 	    Origin ! {printPlayers, AliasList};
