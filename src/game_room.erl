@@ -28,7 +28,7 @@ room(Game, GameName, PlayerList) ->
 	{newPlayer, Pid, Alias} ->
 	    srv ! {debug, "New player added to "++GameName++" room"},
 	    Pid ! {message, GameName, "Welcome to "++GameName++" game room!\n\n"
-		   ++"Available commands are: /players, /quit\n"},
+		   ++"Available commands are: /players, /quit, /challenge\n"},
 	    sendMessage(PlayerList, "", Alias++" has joined the room"),
 	    NewPlayerList = [{Pid, Alias, [game, Game]} | PlayerList];
 	{quitPlayer, Pid, Alias} ->
