@@ -107,7 +107,7 @@ game_menu([{_, DisplayName,_} | GameListIter], Num, Alias, GameList) ->
 
 
 gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias, 0) ->
-    srv ! {enterGameRoom, Alias, ClientPid, {GameModule, GameName, RoomPid}},
+    srv ! {enterGameRoom, Alias, ClientPid, {GameModule, RoomPid}},
     gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias, 1);
 gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias,1) ->
     RoomPid ! {input, ClientPid, Alias, getInput()},

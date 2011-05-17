@@ -30,8 +30,18 @@ database() ->
 	{getStatus, Pid, Origin} ->
 	    X = ets:lookup(clientTable,Pid),
 	    Origin ! X;
-	{getAlias,Pid,Origin} ->
+	
+	{getAlias, Pid, Origin} ->
 	    Origin ! {alias, ets:lookup_element(clientTable,Pid,2)};
+
+	{getPid, Alias, Origin} ->
+		Pids = ets:match(clientTable, {'$1', Alias, '_'}),
+		case Pids of
+			[] -> 
+				Origin ! {returnPid, nomatch};
+			_ ->
+				Origin ! {returnPid, hd(Pids)}
+		end;
 	
 	{getSameStatus, Status, Origin} ->
 	    X = ets:match(clientTable, {'$1', '$2', Status}),
