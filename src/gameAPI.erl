@@ -7,18 +7,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 init(Game, Players) ->
-	State = Game:init(),
+	State = Game:init(Players),
 	run(Game, State, Players, []).
 
 run(Game, State, Players, []) ->
 	run(Game, State, Players, Players);
 run(Game, State, Players, [NextPlayer | RemainingPlayers]) ->
-	case Game:checkFinished(State) of
+	case Game:checkFinished(State, Players) of
 		{true, Winner} ->
 			finish(Winner, Players);
 		{false} ->
-			State = Game:nextTurn(NextPlayer),
-			run(Game, State, Players, RemainingPlayers)
+			NewState = Game:nextTurn(State, NextPlayer),
+			run(Game, NewState, Players, RemainingPlayers)
 	end.
 
 finish({_, WinnerAlias, _}, Players) ->
