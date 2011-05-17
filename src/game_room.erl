@@ -37,10 +37,11 @@ room(Game, GameName, PlayerList) ->
 	    srv ! {setStatus, Pid, Alias, [main]},
 	    sendMessage(PlayerList, "", Alias++" has left the room.");
 	{input, Origin, Alias, Input} ->
-	    srv ! {debug, "Handle player input "++GameName++" room"},
+	    srv ! {debug, "Handle player input "++GameName++" room."},
 	    spawn(game_room,handleInput, [self(), Input, Origin, Alias, PlayerList]),
 	    NewPlayerList = PlayerList;	
 	{challange, Aliases, Origin} ->
+		srv ! {debug, "Challenging another player."};
 		spawn(game_room, sendChallange, [Aliases, Origin]),
 		NewPlayerList = PlayerList;
 	{initiateGame, Players} ->
