@@ -40,8 +40,8 @@ room(Game, GameName, PlayerList) ->
 	    srv ! {debug, "Handle player input "++GameName++" room."},
 	    spawn(game_room,handleInput, [self(), Input, Origin, Alias, PlayerList]),
 	    NewPlayerList = PlayerList;	
-	{challange, Aliases, Origin} ->
-		srv ! {debug, "Challenging another player."};
+	{challenge, Aliases, Origin} ->
+		srv ! {debug, "Challenging another player."},
 		spawn(game_room, sendChallange, [Aliases, Origin]),
 		NewPlayerList = PlayerList;
 	{initiateGame, Players} ->
