@@ -86,7 +86,7 @@ game_menu([], Num, Alias, GameList) ->
 	    Game = lists:nth(Input, GameList),
 	    GameRoomInputPid = spawn(client_handler, gameRoom, [Game, self(), Alias, 0]),
 	    State = receiver(GameList, 1, Alias),
-	    exit(GameRoomInputPid, kill),
+	    exit(GameRoomInputPid, normal),
 	    case State of 
 		{game, GamePid} ->
 		    gameMode(GamePid);
