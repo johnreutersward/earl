@@ -7,7 +7,7 @@
 %% @doc this module contains all the functions that is related to the game room.
 
 -module(game_room).
--export([init/2, handleInput/5, commandParser/5, printPlayers/1, sendToClient/2]).
+-export([init/2, handleInput/5, commandParser/5, sendChallange/2, printPlayers/1, sendToClient/2]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the game room
@@ -37,12 +37,19 @@ room(Game, GameName, PlayerList) ->
 	    srv ! {setStatus, Pid, Alias, [main]},
 	    sendMessage(PlayerList, "", Alias++" has left the room.");
 	{input, Origin, Alias, Input} ->
-	    srv ! {debug, "Handle player input "++GameName++" room"},
+	    srv ! {debug, "Handle player input "++GameName++" room."},
 	    spawn(game_room,handleInput, [self(), Input, Origin, Alias, PlayerList]),
-	    NewPlayerList = PlayerList	
-%	{challange, Aliases, Origin} ->
+	    NewPlayerList = PlayerList;	
+	{challange, Aliases, Origin} ->
+		srv ! {debug, "Challenging another player."};
+		spawn(game_room, sendChallange, [Aliases, Origin]),
+		NewPlayerList = PlayerList;
+	{initiateGame, Players} ->
+		Players2 = [{Pid, Alias, [game, Game]} || {Pid, Alias} <- Players],
+		srv ! {setStatus, Players2},
+		NewPlayerList = lists:filter(fun({P, _, _}) -> lists:keymember(P, 1, Players) == false end, PlayerList),
+		spawn(gameAPI, init, [Game, Players])
 
-	   
     end,
     room(Game, GameName, NewPlayerList).
 
@@ -65,7 +72,7 @@ commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList) ->
     [Command | Params] = string:tokens(Input, " "),
     case Command of
 	"challenge" ->
-	   RoomPid ! {challenge, Params, Origin}; 
+	   RoomPid ! {challenge, Params, {Origin, Alias}}; 
 	"quit" ->
 	    RoomPid ! {quitPlayer, Origin, Alias};
 	"players" ->
@@ -101,3 +108,12 @@ sendMessage([{H, User, _} | T], Alias, Message) ->
 sendToClient(Pid, Message) ->
     Pid ! {directMessage, Message}.
 
+sendChallange(Aliases, Origin) ->
+	Alias = hd(Aliases),
+	srv ! {getPid, Alias, self()},
+	receive
+		{returnPid, nomatch} ->
+			sendToClient(Origin, "ERROR: No such player available\n");
+		{returnPid, Pid} ->
+			Pid ! {challange, Origin}
+	end.

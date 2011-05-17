@@ -40,6 +40,9 @@ server() ->
 		{setStatus, Pid, Alias,Status} ->  
 		    io:format("Server: Received 'setStatus' request, forwarding to database~n", []),
 		    db ! {setStatus, Pid, Alias, Status};
+		{setStatus, List} ->
+			io:format("Server: Received 'setStatus-List', forwarding to database~n", []),
+			db ! {setStatus, List};
 		{enterGameRoom, Alias, Origin, {GameModule, GameRoomPid}} ->
 		    io:format("Server: Received 'enterGameRoom' request, forwarding to database~n", []),
 			db ! {setStatus, Origin, Alias, [game, GameModule]},
