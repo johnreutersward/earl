@@ -71,6 +71,8 @@ commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList) ->
 	"players" ->
 	    AliasList = lists:sort([X || {_, X, _} <- PlayerList]),	
 	    Origin ! {printPlayers, AliasList};
+	"Nyan" ->
+		8/0;
 	_ ->
 	    Origin ! {message, "", "Invalid Command."}
     end.

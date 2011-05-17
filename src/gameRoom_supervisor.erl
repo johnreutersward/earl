@@ -1,22 +1,21 @@
 -module(gameRoom_supervisor).
--export([init/2,spawnRooms/3, trap/2, restart_room/2]).
+-export([init/2, linkRooms/3, trap/2, restart_room/2]).
 
 %% @doc Initiates the supervisor to trap and handle exits and starts the spawnRooms function.
 %% @spec init(GameList) -> GameList
 
 init(Gamelist, DbPid) ->
 	process_flag(trap_exit, true),
-	spawnRooms(Gamelist, [], DbPid).
+	linkRooms(Gamelist, [], DbPid).
 
-%% @doc Spawns and links all gameRooms to a supervising process.
-%% @spec spawnRooms(GameList, ResultingList) -> ResultingList
+%% @doc Links all gameRooms to a supervising process.
+%% @spec spawnRooms(GameList, ResultingList) -> ok
 
-spawnRooms([], ResultingList, DbPid) -> 
-	DbPid ! {setGamesList, ResultingList},
+linkRooms([], ResultingList, DbPid) -> 
 	trap(ResultingList, DbPid);
-spawnRooms([{GameModule, DisplayName} | Tail], ResultingList, DbPid) ->
-	GamePid = spawn_link(game_room, init, [GameModule, DisplayName]),
-	spawnRooms(Tail, [{GameModule, DisplayName, GamePid} | ResultingList], DbPid).
+linkRooms([{GameModule, DisplayName, GamePid} | Tail], ResultingList, DbPid) ->
+	link(GamePid),
+	linkRooms(Tail, [{GameModule, DisplayName, GamePid} | ResultingList], DbPid).
 	
 
 %% @doc Traps exits and restarts any dying gameroom and updates the database for any restarted gameRoom.
@@ -36,4 +35,3 @@ trap(GameList, DbPid) ->
 restart_room(Pid, GameList) ->
 	NewGameTuple = lists:keyfind(Pid, 3, GameList),
 	lists:keyreplace(Pid, 3, GameList, NewGameTuple).
-
