@@ -53,7 +53,10 @@ database() ->
 	{setStatus, Pid, Alias, Status} ->
 	    srv ! {debug, "Database: Setting status for "++Alias},
 	    ets:insert(clientTable,{Pid,Alias,Status});
-	
+	{setStatus, List} ->
+		srv ! {debug, "Database: Setting status for list of players"},
+		ets:insert(clientTable, List);
+
 	{checkAlias, Alias, Origin} ->
 	    checkAlias(Alias, Origin);
 	
