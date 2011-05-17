@@ -43,9 +43,9 @@ print(Output, [Player | Players]) ->
 %  Functions to implement in Games
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% init() -> State
+% init(Players) -> State
 
-% checkFinished(State) -> Winner
+% checkFinished(State, Players) -> {true, Winner} | {false}
 
-% nextTurn(NextPlayer) -> State
+% nextTurn(State, NextPlayer) -> State
 
