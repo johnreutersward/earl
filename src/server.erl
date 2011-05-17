@@ -28,6 +28,7 @@ init() ->
     register(db,spawn(database,init,[])),
     LoadList = loadGamesList(),
     GameList = spawnGameRooms(LoadList,[]),
+	spawn(gameRoom_supervisor, init, [GameList, db]),
     db ! {setGamesList, GameList},
     server().
 
