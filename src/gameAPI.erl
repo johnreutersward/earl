@@ -16,14 +16,18 @@ run(Game, State, Players, [NextPlayer | RemainingPlayers]) ->
 	case Game:checkFinished(State, Players) of
 		{true, Winner} ->
 			finish(Winner, Players);
+		{draw} ->
+			draw(Players);
 		{false} ->
 			NewState = Game:nextTurn(State, NextPlayer),
 			run(Game, NewState, Players, RemainingPlayers)
 	end.
 
-finish({_, WinnerAlias, _}, Players) ->
+finish({_, WinnerAlias}, Players) ->
 	print("The winner is "++WinnerAlias++"! Congratulations!\n", Players).
 
+draw(Players) ->
+	print("The game is a draw. All are winners!\n",Players).
 
 getInput(Pid) ->
 	Pid ! {input},
@@ -45,7 +49,7 @@ print(Output, [Player | Players]) ->
 
 % init(Players) -> State
 
-% checkFinished(State, Players) -> {true, Winner} | {false}
+% checkFinished(State, Players) -> {true, Winner} | {draw} | {false}
 
 % nextTurn(State, NextPlayer) -> State
 
