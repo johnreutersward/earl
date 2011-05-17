@@ -9,7 +9,7 @@
 %% and the server.
 
 -module(client_handler).
--export([init/1, create_alias/1, main_menu/2, getNumber/0, getInput/0, trim/1, runtest/0, numConnected/0,gameRoom/4,help/2,receiver/3,printPlayers/1]).
+-export([init/1, runtest/0, gameRoom/4,receiver/3]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the client handler.
