@@ -1,6 +1,6 @@
 
 -module(gameAPI).
--export([init/2, getInput/1, print/2]).
+-export([init/2, getInput/1, print/2,getPlayer/2]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GameAPI functions 
@@ -19,7 +19,7 @@ run(Game, State, Players, [NextPlayer | RemainingPlayers]) ->
 		{draw} ->
 			draw(Players);
 		{false} ->
-			NewState = Game:nextTurn(State, NextPlayer),
+			NewState = Game:nextTurn(State, NextPlayer,Players),
 			run(Game, NewState, Players, RemainingPlayers)
 	end.
 
@@ -41,6 +41,12 @@ print(_, []) ->
 print(Output, [Player | Players]) ->
 	Player ! {output, Output},
 	print(Output, Players).
+
+getPlayer(Int,[]) ->
+    [];
+getPlayer(Int,Players) ->
+    [lists:nth(Int,Players)].
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
