@@ -8,7 +8,7 @@
 %% clients and clients to database the database.
 
 -module(server).
--export([init/0,server/0,runtest/0,spawnGameRooms/2]).
+-export([init/0, runtest/0, getGame/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the server
@@ -36,28 +36,34 @@ init() ->
 
 server() ->
     receive
-	{setStatus, Pid, Alias,Status} ->  
-	    io:format("Server: Received 'setStatus' request, forwarding to database~n", []),
-	    db ! {setStatus, Pid, Alias, Status};
-	{enterGameRoom, Alias, Origin, {GameModule, _, GameRoomPid}} ->
-	    io:format("Server: Received 'enterGameRoom' request, forwarding to database~n", []),
-		db ! {setStatus, Origin, Alias, [game, GameModule]},
-	    GameRoomPid ! {newPlayer, Origin, Alias};
-	{checkAlias, Alias, Origin} -> 
-	    io:format("Server: Received 'checkAlias', forwarding to db~n", []),
-		spawn(client_supervisor, init, [self(), Origin]),
-		db ! {checkAlias, Alias, Origin};
-	{quit, Pid} ->
-	    io:format("Server: Received 'quit' from ~w, sending removal request to db~n", [Pid]),
-	    db ! {remove,Pid};
-	{debug, Msg} ->
-	    io:format("~s~n", [Msg]);
-	{getNumClients,Origin} ->
-	    io:format("server recevied 'getNumClients'~n",[]),
-	    db ! {getNumClients,Origin};
-	{getSameStatus, Status, Origin} ->
-	    io:format("Server recevied 'getSameStatus'~n", []),
-	    db ! {getSameStatus, Status, Origin}
+		{setStatus, Pid, Alias,Status} ->  
+		    io:format("Server: Received 'setStatus' request, forwarding to database~n", []),
+		    db ! {setStatus, Pid, Alias, Status};
+		{enterGameRoom, Alias, Origin, {GameModule, GameRoomPid}} ->
+		    io:format("Server: Received 'enterGameRoom' request, forwarding to database~n", []),
+			db ! {setStatus, Origin, Alias, [game, GameModule]},
+		    GameRoomPid ! {newPlayer, Origin, Alias};
+		{checkAlias, Alias, Origin} -> 
+		    io:format("Server: Received 'checkAlias', forwarding to db~n", []),
+			spawn(client_supervisor, init, [self(), Origin]),
+			db ! {checkAlias, Alias, Origin};
+		{quit, Pid} ->
+		    io:format("Server: Received 'quit' from ~w, sending removal request to db~n", [Pid]),
+		    db ! {remove,Pid};
+		{debug, Msg} ->
+		    io:format("~s~n", [Msg]);
+		{getNumClients,Origin} ->
+		    io:format("server recevied 'getNumClients'~n",[]),
+		    db ! {getNumClients,Origin};
+		{getSameStatus, Status, Origin} ->
+		    io:format("Server recevied 'getSameStatus'~n", []),
+		    db ! {getSameStatus, Status, Origin};
+		{getAlias, Pid, Origin} -> 
+			io:format("Server: received getAlias request, forwarding to database", []),
+			db ! {getAlias, Pid, Origin};
+		{getPid, Alias, Origin} ->
+			io:format("Server: received getPid request, forwarding to database", []),
+			db ! {getPid, Alias, Origin}
     end,
     server().
 
@@ -95,7 +101,7 @@ readLines(File, Games) ->
 spawnGameRooms([],GameList) -> GameList;
 spawnGameRooms([{GameModule, DisplayName}|T],GameList) ->
     Pid = spawn(game_room, init, [GameModule, DisplayName]),
-    spawnGameRooms(T,[{GameModule,DisplayName,Pid} | GameList]). 
+    spawnGameRooms(T,[{GameModule, DisplayName, Pid} | GameList]). 
 
 % Test cases
 

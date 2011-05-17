@@ -7,7 +7,7 @@
 %% @doc this module contains all the functions that is related to the game room.
 
 -module(game_room).
--export([init/2, room/3, handleInput/6, commandParser/6, sendMessage/3, printPlayers/1, sendToClient/2]).
+-export([init/2, handleInput/5, commandParser/5, printPlayers/1, sendToClient/2]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the game room
@@ -38,9 +38,10 @@ room(Game, GameName, PlayerList) ->
 	    sendMessage(PlayerList, "", Alias++" has left the room.");
 	{input, Origin, Alias, Input} ->
 	    srv ! {debug, "Handle player input "++GameName++" room"},
-	    spawn(game_room,handleInput, [self(), Input, Origin, Alias, PlayerList, Game]),
+	    spawn(game_room,handleInput, [self(), Input, Origin, Alias, PlayerList]),
 	    NewPlayerList = PlayerList	
-%%	{challange, Aliases, Origin} ->
+%	{challange, Aliases, Origin} ->
+
 	   
     end,
     room(Game, GameName, NewPlayerList).
@@ -48,10 +49,10 @@ room(Game, GameName, PlayerList) ->
 %% @doc handles the input depending on if it starts with "/" or not
 %% @hidden
 
-handleInput(RoomPid, Input, Origin, Alias, PlayerList, Game) ->
+handleInput(RoomPid, Input, Origin, Alias, PlayerList) ->
     if 
 	[hd(Input)] == "/" ->
-	    commandParser(RoomPid,Input,Origin,Alias, PlayerList, Game);
+	    commandParser(RoomPid,Input,Origin,Alias, PlayerList);
 	true ->
 %	    spawn(game_room,sendMessage,[PlayerList,Alias,Input])
 	    ok
@@ -60,7 +61,7 @@ handleInput(RoomPid, Input, Origin, Alias, PlayerList, Game) ->
 %% @doc this function decides which command the user wants to input.
 %% @hidden
 	
-commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList, Game) ->
+commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList) ->
     [Command | Params] = string:tokens(Input, " "),
     case Command of
 	"challenge" ->
