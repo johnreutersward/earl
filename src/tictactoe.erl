@@ -22,7 +22,9 @@ init(Players) ->
     InitiatedPlayers = [{lists:nth(1,PlayerList),"X"},{lists:nth(2,PlayerList),"O"}],
     print("You are Player 1!\n",getPlayer(1,Players)),
     print("You are Player 2!\n",getPlayer(2,Players)),
-    {InitiatedPlayers,[a," "," "," "],[b," "," "," "],[c," "," "," "]}.
+    State = {InitiatedPlayers,[a," "," "," "],[b," "," "," "],[c," "," "," "]},
+    printState(State,Players),
+    State.
 
 %% @doc checks if someone has won or if a draw occurs.
 %% @spec checkFinnished(State,Players) -> {draw}; {flase}; {true,Player}
