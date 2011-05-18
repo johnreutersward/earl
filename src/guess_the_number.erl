@@ -30,10 +30,10 @@ nextTurn({_,The_number,_},{Next_player_Pid,Next_player_Alias},Players) ->
 
 
 
-checkFinished({A,_,{_,C2}},_) ->
+checkFinished({A,_,C},_) ->
     case A of
 	1 ->
-	    {true,C2};
+	    {true,C};
 	0 ->
 	    {false}
     end.
