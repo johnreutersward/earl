@@ -15,15 +15,15 @@ nextTurn({_,The_number,_,Players},{Next_player_Pid,Next_player_Alias}) ->
     The_guess = gameAPI:getInput(Next_player_Pid),
     case The_guess of
 	The_number ->
-	    gameAPI:print("That's the right number!!~n",Players),
+	    gameAPI:print("That's the right number!!\n",Players),
 	    {1,The_number,{Next_player_Pid, Next_player_Alias},Players};
 	_ ->
 	    if 
 		The_guess < The_number ->
-		    gameAPI:print("The number is bigger!~n",Players),
+		    gameAPI:print("The number is bigger!\n",Players),
 		    {0,The_number,{Next_player_Pid,Next_player_Alias},Players};
 		true ->
-		    gameAPI:print("The number is smaller!~n",Players),
+		    gameAPI:print("The number is smaller!\n",Players),
 		    {0,The_number,{Next_player_Pid,Next_player_Alias},Players}
 	    end    
     end.
