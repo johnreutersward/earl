@@ -1,6 +1,6 @@
 
 -module(gameAPI).
--export([init/2, getInput/1, print/2,getPlayer/2]).
+-export([init/2, getInput/1, getNumber/1, print/2,getPlayer/2]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GameAPI functions 
@@ -31,6 +31,12 @@ draw(Players) ->
 
 getInput(Pid) ->
 	Pid ! {input},
+	receive
+		{input, Input} ->
+			Input
+	end.
+getNumber(Pid) ->
+	Pid ! {inputNumber},
 	receive
 		{input, Input} ->
 			Input

@@ -218,6 +218,9 @@ gameMode(GamePid) ->
 	{input} ->
 	    GamePid ! {input, getInput()},
 		gameMode(GamePid);
+	{inputNumber} ->
+		GamePid ! {input, getNumber()},
+		gameMode(GamePid);
 	{finish} ->
 	    ok
     end.
