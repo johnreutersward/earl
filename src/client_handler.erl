@@ -142,15 +142,16 @@ receiver(GameList,Num,Alias) ->
 				GameRoom ! {initiateGame, [{OriginPid, OriginAlias}, {self(), Alias}]};
 			_ ->
 				io:format("Challange declined.~n", []),
-				OriginPid ! {declineChallange, Alias},
-				receiver(GameList, Num, Alias)
-		end;
+				OriginPid ! {declineChallange, Alias}
+		end,
+		receiver(GameList, Num, Alias);
 
 	{declineChallange, Alias} ->
 		io:format("~s has declined your challange.~n", [Alias]),
 		receiver(GameList, Num, Alias);
 	{game, GamePid} ->
-	    {game, GamePid};
+		io:format("GameMode request received", []),
+		{game, GamePid};
 	{printPlayers, PlayerList} ->
 	    printPlayers(PlayerList),
 	    receiver(GameList, Num, Alias)
@@ -212,9 +213,11 @@ help(ClientPid,Alias) ->
 gameMode(GamePid) ->
     receive
 	{output, Message} ->
-	    io:format("~s~n", [Message]);
+	    io:format("~s~n", [Message]),
+		gameMode(GamePid);
 	{input} ->
-	    GamePid ! {input, getInput()};
+	    GamePid ! {input, getInput()},
+		gameMode(GamePid);
 	{finish} ->
 	    ok
     end.
