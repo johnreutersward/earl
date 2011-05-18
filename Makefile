@@ -3,6 +3,7 @@ SRC = src
 ERLC = erlc -W -o $(EBIN)
 SERVER = erl -sname server -connect_all false -pa $(EBIN) -s server init
 CLIENT = erl -noshell -sname client -connect_all false -pa $(EBIN) -s client init
+DOCCER = erl -noshell -pa $(EBIN) -s edoccer init
 
 all:	build
 
@@ -11,10 +12,11 @@ build:
 	$(ERLC) $(SRC)/*.erl
 	@echo "All compiled"
 
-doc:	all
-		@mkdir -p doc
-		erl -noshell -run edoc application (earl, *.erl
-		echo "Not yet implemented"
+doc: all
+	@mkdir -p doc
+	@echo "Generating edoc files"
+	@$(DOCCER)
+	@echo "All done"
 
 client:	all
 	@clear
