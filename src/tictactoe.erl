@@ -27,7 +27,7 @@ init(Players) ->
     State.
 
 %% @doc checks if someone has won or if a draw occurs.
-%% @spec checkFinnished(State,Players) -> {draw}; {flase}; {true,Player}
+%% @spec checkFinished(State,Players) -> {draw}| {false}| {true,Player}
 
 checkFinished({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->   
     State = checkWinner({'_',[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players),
@@ -49,7 +49,7 @@ checkFinished({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
 
 
 %% @doc checks the state if someone has won
-%% @spec checkWinner(State,Players) -> {false}; {true,Player}
+%% @spec checkWinner(State,Players) -> {false}| {true,Player}
 
 checkWinner({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
     if
@@ -90,7 +90,7 @@ checkWinner({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
 
 
 %% @doc handles the next turn, enables the current player to make a move
-%% @spec nextTurn(State,Player,Players)
+%% @spec nextTurn(State,Player,Players) -> ok
 
 nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},{PlayerPid,Alias},Players) ->
     print("Your Turn!\n",[{PlayerPid,Alias}]),
@@ -134,7 +134,7 @@ nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},
 
 
 %% @doc A function that handles the moves a player can do
-%% @spec place(Move,Input,Player,State) -> State
+%% @spec place(Move,Input,Player,State, Players) -> State
 %% @hidden
 
 place(Move,Input,Player,State,_) ->

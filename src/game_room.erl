@@ -7,7 +7,7 @@
 %% @doc this module contains all the functions that is related to the game room.
 
 -module(game_room).
--export([init/2, handleInput/5, commandParser/5, sendChallange/3, printPlayers/1, sendToClient/2]).
+-export([init/2, handleInput/5, commandParser/5, sendChallenge/3, printPlayers/1, sendToClient/2]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the game room
@@ -42,7 +42,7 @@ room(Game, GameName, PlayerList) ->
 	    NewPlayerList = PlayerList;	
 	{challenge, Aliases, Origin} ->
 		srv ! {debug, "Challenging another player."},
-		spawn(game_room, sendChallange, [Aliases, Origin, self()]),
+		spawn(game_room, sendChallenge, [Aliases, Origin, self()]),
 		NewPlayerList = PlayerList;
 	{initiateGame, Players} ->
 		srv ! {debug, "GameRoom received initiateGame, attempting to start game module"},
@@ -117,12 +117,12 @@ playersToGameMode(GamePid, [{Pid, Alias} | Players]) ->
 sendToClient(Pid, Message) ->
     Pid ! {directMessage, Message}.
 
-sendChallange(Aliases, Origin, GameRoomPid) ->
+sendChallenge(Aliases, Origin, GameRoomPid) ->
 	Alias = hd(Aliases),
 	srv ! {getPid, Alias, self()},
 	receive
 		{returnPid, nomatch} ->
 			sendToClient(Origin, "ERROR: No such player available\n");
 		{returnPid, Pid} ->
-			Pid ! {challange, GameRoomPid, Origin}
+			Pid ! {challenge, GameRoomPid, Origin}
 	end.
