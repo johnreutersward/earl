@@ -3,7 +3,8 @@ SRC = src
 ERLC = erlc -W -o $(EBIN)
 SERVER = erl -sname server -connect_all false -pa $(EBIN) -s server init
 CLIENT = erl -noshell -sname client -connect_all false -pa $(EBIN) -s client init
-DOCCER = erl -noshell -pa $(EBIN) -s edoccer init
+DOCCER = erl -noshell -pa $(EBIN) -s makeutils doccer
+TESTER = erl -noshell -pa $(EBIN) -s makeutils tester
 
 all:	build
 
@@ -29,4 +30,10 @@ server:	all
 clean:
 	@rm -fv $(EBIN)/*.beam
 	@rm -fv erl_crash.dump
+
+test: all
+	@echo "Running testcases"
+	@$(TESTER)
+	@echo "All done"
+
 
