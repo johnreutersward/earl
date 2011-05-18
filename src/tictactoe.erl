@@ -239,7 +239,7 @@ printState({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
     print("====1===2===3====\n",Players),
     print("A % " ++ A1 ++ " % " ++ A2 ++ " % " ++ A3 ++ " %\n",Players),
     print("B % " ++ B1 ++ " % " ++ B2 ++ " % " ++ B3 ++ " %\n",Players),
-    print("C % " ++ C1 ++ " % " ++ C2 ++ " % " ++ C3,++ " %\n"Players),
+    print("C % " ++ C1 ++ " % " ++ C2 ++ " % " ++ C3 ++ " %\n",Players),
     print("================================\n",Players).
     
 
