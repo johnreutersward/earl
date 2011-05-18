@@ -115,5 +115,5 @@ sendChallange(Aliases, Origin) ->
 		{returnPid, nomatch} ->
 			sendToClient(Origin, "ERROR: No such player available\n");
 		{returnPid, Pid} ->
-			Pid ! {challange, Origin}
+			Pid ! {challange, self(), Origin}
 	end.
