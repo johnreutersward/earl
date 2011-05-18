@@ -20,14 +20,14 @@ init(Players) ->
     print("let the Game Begin!\n",Players),
     PlayerList = [X || {X,_} <- Players],
     InitiatedPlayers = [{lists:nth(1,PlayerList),"X"},{lists:nth(2,PlayerList),"O"}],
-    print("You are Player 1!\n",getPlayer(1,Players)),
-    print("You are Player 2!\n",getPlayer(2,Players)),
+    print("You are Player 1!\n",[getPlayer(1,Players)]),
+    print("You are Player 2!\n",[getPlayer(2,Players)]),
     State = {InitiatedPlayers,[a," "," "," "],[b," "," "," "],[c," "," "," "]},
     printState(State,Players),
     State.
 
 %% @doc checks if someone has won or if a draw occurs.
-%% @spec checkFinished(State,Players) -> {draw}| {false}| {true,Player}
+%% @spec checkFinnished(State,Players) -> {draw}; {flase}; {true,Player}
 
 checkFinished({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->   
     State = checkWinner({'_',[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players),
@@ -49,7 +49,7 @@ checkFinished({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
 
 
 %% @doc checks the state if someone has won
-%% @spec checkWinner(State,Players) -> {false}| {true,Player}
+%% @spec checkWinner(State,Players) -> {false}; {true,Player}
 
 checkWinner({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
     if
@@ -90,7 +90,7 @@ checkWinner({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
 
 
 %% @doc handles the next turn, enables the current player to make a move
-%% @spec nextTurn(State,Player,Players) -> ok
+%% @spec nextTurn(State,Player,Players)
 
 nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},{PlayerPid,Alias},Players) ->
     print("Your Turn!\n",[{PlayerPid,Alias}]),
@@ -134,7 +134,7 @@ nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},
 
 
 %% @doc A function that handles the moves a player can do
-%% @spec place(Move,Input,Player,State, Players) -> State
+%% @spec place(Move,Input,Player,State) -> State
 %% @hidden
 
 place(Move,Input,Player,State,_) ->
@@ -142,7 +142,7 @@ place(Move,Input,Player,State,_) ->
 	"a1" ->
 	    input("a1",Input,State,Player);
 	"a2" ->
-	    input("a1",Input,State,Player);
+	    input("a2",Input,State,Player);
 	"a3" ->
 	    input("a3",Input,State,Player);
 	"b1" ->
@@ -237,9 +237,9 @@ printState(illegalmove,_) ->
 printState({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
     print("================================\n",Players),
     print("====1===2===3====\n",Players),
-    print("A % " ++ A1 ++ " % " ++ A2 ++ " % \n" ++ A3,Players),
-    print("B % " ++ B1 ++ " % " ++ B2 ++ " % \n" ++ B3,Players),
-    print("C % " ++ C1 ++ " % " ++ C2 ++ " % \n" ++ C3,Players),
+    print("A % " ++ A1 ++ " % " ++ A2 ++ " % " ++ A3 ++ " %\n",Players),
+    print("B % " ++ B1 ++ " % " ++ B2 ++ " % " ++ B3 ++ " %\n",Players),
+    print("C % " ++ C1 ++ " % " ++ C2 ++ " % " ++ C3,++ " %\n"Players),
     print("================================\n",Players).
     
 

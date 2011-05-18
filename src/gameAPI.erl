@@ -49,9 +49,9 @@ print(Output, [{Pid,Alias} | Players]) ->
 	print(Output, Players).
 
 getPlayer(Int,[]) ->
-    [];
+    ok;
 getPlayer(Int,Players) ->
-    [lists:nth(Int,Players)].
+    lists:nth(Int,Players).
 
 
 
