@@ -49,8 +49,8 @@ room(Game, GameName, PlayerList) ->
 %		Players2 = [{Pid, Alias, [game, Game]} || {Pid, Alias} <- Players],
 		srv ! {setStatus, Players},
 		NewPlayerList = lists:filter(fun({P, _, _}) -> lists:keymember(P, 1, Players) == false end, PlayerList),
-		spawn(gameAPI, init, [Game, Players]),
-		playersToGameMode(Game, Players)
+		GamePid = spawn(gameAPI, init, [Game, Players]),
+		playersToGameMode(GamePid, Players)
     end,
     room(Game, GameName, NewPlayerList).
 
@@ -108,10 +108,10 @@ sendMessage([{H, User, _} | T], Alias, Message) ->
 
 playersToGameMode(_, []) ->
 	ok;
-playersToGameMode(Game, [{Pid, Alias} | Players]) ->
+playersToGameMode(GamePid, [{Pid, Alias} | Players]) ->
 	srv ! {debug, "Making "++Alias++" go into game mode"},
-	Pid ! {game, Game},
-	playersToGameMode(Game, Players).
+	Pid ! {game, GamePid},
+	playersToGameMode(GamePid, Players).
 
 
 sendToClient(Pid, Message) ->
