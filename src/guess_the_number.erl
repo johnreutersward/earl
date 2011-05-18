@@ -1,5 +1,5 @@
 -module(guess_the_number).
--export([init/1, nextTurn/2,checkFinished/2]).
+-export([init/1, nextTurn/3,checkFinished/2]).
 
 
 init(Players) -> 
