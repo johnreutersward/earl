@@ -16,13 +16,15 @@
 
 init(Players) ->
     print("======== Tic Tac Toe ========\n", Players),
-    %print("Welcome to Tic Tac Toe, the very\nexciting game of wits and strategy\n",Players),
-    %print("let the Game Begin!\n",Players),
+    print("Welcome to Tic Tac Toe, the very\nexciting game of wits and strategy\n",Players),
+    print("let the Game Begin!\n",Players),
     PlayerList = [X || {X,_} <- Players],
     InitiatedPlayers = [{lists:nth(1,PlayerList),"X"},{lists:nth(2,PlayerList),"O"}],
-    %print("You are Player 1!\n",getPlayer(1,Players)),
-    %print("You are Player 2!\n",getPlayer(2,Players)),
-    {InitiatedPlayers,[a," "," "," "],[b," "," "," "],[c," "," "," "]}.
+    print("You are Player 1!\n",getPlayer(1,Players)),
+    print("You are Player 2!\n",getPlayer(2,Players)),
+    State = {InitiatedPlayers,[a," "," "," "],[b," "," "," "],[c," "," "," "]},
+    printState(State,Players),
+    State.
 
 %% @doc checks if someone has won or if a draw occurs.
 %% @spec checkFinished(State,Players) -> {draw}| {false}| {true,Player}
@@ -102,15 +104,15 @@ nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},
     receive
 	{input,Input} ->
 	    case Input of
-		_ when Input /= A1 ;
-		       Input /= A2 ;
-		       Input /= A3 ;
-		       Input /= B1 ;
-		       Input /= B2 ;
-		       Input /= B3 ;
-		       Input /= C1 ;
-		       Input /= C2 ;
-		       Input /= C3 ->
+		_ when Input /= "a1" ;
+		       Input /= "a2" ;
+		       Input /= "a3" ;
+		       Input /= "b1" ;
+		       Input /= "b2" ;
+		       Input /= "b3" ;
+		       Input /= "c1" ;
+		       Input /= "c2" ;
+		       Input /= "c3" ->
 		    print("Not a Move!~m",[{PlayerPid,Alias}]),
 		    State = nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},{PlayerPid,Alias},Players);
 		Input ->
