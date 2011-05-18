@@ -138,14 +138,17 @@ receiver(GameList,Num,Alias) ->
 		io:format("~s is challanging you! Do you accept? y/n~n", [OriginAlias]),
 		case hd(getInput()) of
 			$y ->
+				io:format("Client: Sending initiateGame to game room", []),
 				GameRoom ! {initiateGame, [{OriginPid, OriginAlias}, {self(), Alias}]};
 			_ ->
 				io:format("Challange declined.~n", []),
-				OriginPid ! {declineChallange, Alias}
+				OriginPid ! {declineChallange, Alias},
+				receiver(GameList, Num, Alias)
 		end;
 
 	{declineChallange, Alias} ->
-		io:format("~s has declined your challange.~n", [Alias]);
+		io:format("~s has declined your challange.~n", [Alias]),
+		receiver(GameList, Num, Alias);
 	{game, GamePid} ->
 	    {game, GamePid};
 	{printPlayers, PlayerList} ->
