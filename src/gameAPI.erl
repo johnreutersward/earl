@@ -38,8 +38,8 @@ getInput(Pid) ->
 
 print(_, []) ->
 	ok;
-print(Output, [Player | Players]) ->
-	Player ! {output, Output},
+print(Output, [{Pid,Alias} | Players]) ->
+	Pid ! {output, Output},
 	print(Output, Players).
 
 getPlayer(Int,[]) ->
