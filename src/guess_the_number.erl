@@ -3,7 +3,7 @@
 
 
 init(Players) -> 
-    Message = "Welcome to Guess The Number! You are supposed to guess a number between 0 and 100.~n",
+    Message = "Welcome to Guess The Number! You are supposed to guess a number between 0 and 100.\n",
     gameAPI:print(Message,Players),
     Number = random:uniform(),
     The_number = trunc(Number * 100),
