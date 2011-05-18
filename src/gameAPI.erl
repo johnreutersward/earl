@@ -19,7 +19,7 @@ run(Game, State, Players, [NextPlayer | RemainingPlayers]) ->
 		{draw} ->
 			draw(Players);
 		{false} ->
-			NewState = Game:nextTurn(State, NextPlayer,Players),
+			NewState = Game:nextTurn(State, NextPlayer, Players),
 			run(Game, NewState, Players, RemainingPlayers)
 	end.
 
@@ -57,5 +57,5 @@ getPlayer(Int,Players) ->
 
 % checkFinished(State, Players) -> {true, Winner} | {draw} | {false}
 
-% nextTurn(State, NextPlayer) -> State
+% nextTurn(State, NextPlayer, Players) -> State
 
