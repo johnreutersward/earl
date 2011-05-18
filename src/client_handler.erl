@@ -134,19 +134,19 @@ receiver(GameList,Num,Alias) ->
 	    receiver(GameList, Num, Alias);
 	{back} -> 
 	    ok;
-	{challange, GameRoom, {OriginPid, OriginAlias}} ->
+	{challenge, GameRoom, {OriginPid, OriginAlias}} ->
 		io:format("~s is challenging you! Do you accept? y/n~n", [OriginAlias]),
 		case hd(getInput()) of
 			$y ->
 				io:format("Client: Sending initiateGame to game room", []),
 				GameRoom ! {initiateGame, [{OriginPid, OriginAlias}, {self(), Alias}]};
 			_ ->
-				io:format("Challange declined.~n", []),
-				OriginPid ! {declineChallange, Alias}
+				io:format("Challenge declined.~n", []),
+				OriginPid ! {declineChallenge, Alias}
 		end,
 		receiver(GameList, Num, Alias);
 
-	{declineChallange, Alias} ->
+	{declineChallenge, Alias} ->
 		io:format("~s has declined your challenge.~n", [Alias]),
 		receiver(GameList, Num, Alias);
 	{game, GamePid} ->
