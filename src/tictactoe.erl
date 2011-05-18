@@ -93,7 +93,7 @@ checkWinner({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
 %% @spec nextTurn(State,Player,Players)
 
 nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},{PlayerPid,Alias},Players) ->
-    print("Your Turn!~n",[{PlayerPid,Alias}]),
+    print("Your Turn!\n",[{PlayerPid,Alias}]),
     if 
 	PlayerPid == Player1 ->
 	    Move = "X";
@@ -104,28 +104,29 @@ nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},
     receive
 	{input,Input} ->
 	    case Input of
-		_ when Input /= "a1" ;
-		       Input /= "a2" ;
-		       Input /= "a3" ;
-		       Input /= "b1" ;
-		       Input /= "b2" ;
-		       Input /= "b3" ;
-		       Input /= "c1" ;
-		       Input /= "c2" ;
+		_ when Input /= "a1" ,
+		       Input /= "a2" ,
+		       Input /= "a3" ,
+		       Input /= "b1" ,
+		       Input /= "b2" ,
+		       Input /= "b3" ,
+		       Input /= "c1" ,
+		       Input /= "c2" ,
 		       Input /= "c3" ->
-		    print("Not a Move!~m",[{PlayerPid,Alias}]),
+		    print(Input ++ " Is not a Move!\n",[{PlayerPid,Alias}]),
 		    State = nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},{PlayerPid,Alias},Players);
 		Input ->
 		    State = place(Input,Move,{PlayerPid,Alias},{[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players)
 	    end
     end,
-	    if
-		State == illegalmove ->
-		    print("Illegal Move!~n",[{PlayerPid,Alias}]),
-		    nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},{PlayerPid,Alias},Players);
-		true ->
-		    State
-	    end.
+    if
+	State == illegalmove ->
+	    print("Illegal Move!\n",[{PlayerPid,Alias}]),
+	    nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},{PlayerPid,Alias},Players);
+	true ->
+	    printState(State,Players),
+	    State
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Help functions            
@@ -136,37 +137,27 @@ nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},
 %% @spec place(Move,Input,Player,State) -> State
 %% @hidden
 
-place(Move,Input,Player,State,Players) ->
+place(Move,Input,Player,State,_) ->
     case Move of
 	"a1" ->
-	    NewState = input("a1",Input,State,Player),
-	    printState(NewState,Players);
+	    input("a1",Input,State,Player);
 	"a2" ->
-	    NewState = input("a1",Input,State,Player),
-	    printState(NewState,Players);
+	    input("a1",Input,State,Player);
 	"a3" ->
-	    NewState = input("a3",Input,State,Player),
-	    printState(NewState,Players);
+	    input("a3",Input,State,Player);
 	"b1" ->
-	    NewState = input("b1",Input,State,Player),
-	    printState(NewState,Players);
+	    input("b1",Input,State,Player);
 	"b2" ->
-	    NewState = input("b2",Input,State,Player),
-	    printState(NewState,Players);
+	    input("b2",Input,State,Player);
 	"b3" ->
-	    NewState = input("b3",Input,State,Player),
-	    printState(NewState,Players);
+	    input("b3",Input,State,Player);
 	"c1" ->
-	    NewState = input("c1",Input,State,Player),
-	    printState(NewState,Players);
+	    input("c1",Input,State,Player);
 	"c2" ->
-	    NewState = input("c2",Input,State,Player),
-	    printState(NewState,Players);
+	    input("c2",Input,State,Player);
 	"c3" ->
-	    NewState = input("c3",Input,State,Player),
-	    printState(NewState,Players)
-    end,
-    NewState.
+	    input("c3",Input,State,Player)
+    end.
 
 %% @hidden
 
@@ -246,10 +237,10 @@ printState(illegalmove,_) ->
 printState({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->
     print("================================\n",Players),
     print("====1===2===3====\n",Players),
-    print("A% " ++ A1 ++ "% " ++ A2 ++ "% \n" ++ A3,Players),
-    print("B% " ++ B1 ++ "% " ++ B2 ++ "% \n" ++ B3,Players),
-    print("C% " ++ C1 ++ "% " ++ C2 ++ "% \n" ++ C3,Players),
-    print("================================~n",Players).
+    print("A % " ++ A1 ++ " % " ++ A2 ++ " % \n" ++ A3,Players),
+    print("B % " ++ B1 ++ " % " ++ B2 ++ " % \n" ++ B3,Players),
+    print("C % " ++ C1 ++ " % " ++ C2 ++ " % \n" ++ C3,Players),
+    print("================================\n",Players).
     
 
 %%%%%%%%%%%%%%%%%%%%%%%
