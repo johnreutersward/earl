@@ -7,7 +7,7 @@
 %% @doc this module contains all the functions that is related to the game room.
 
 -module(game_room).
--export([init/2, handleInput/5, commandParser/5, sendChallange/2, printPlayers/1, sendToClient/2]).
+-export([init/2, handleInput/5, commandParser/5, sendChallange/3, printPlayers/1, sendToClient/2]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the game room
@@ -42,14 +42,15 @@ room(Game, GameName, PlayerList) ->
 	    NewPlayerList = PlayerList;	
 	{challenge, Aliases, Origin} ->
 		srv ! {debug, "Challenging another player."},
-		spawn(game_room, sendChallange, [Aliases, Origin]),
+		spawn(game_room, sendChallange, [Aliases, Origin, self()]),
 		NewPlayerList = PlayerList;
 	{initiateGame, Players} ->
-		Players2 = [{Pid, Alias, [game, Game]} || {Pid, Alias} <- Players],
-		srv ! {setStatus, Players2},
+		srv ! {debug, "GameRoom received initiateGame, attempting to start game module"},
+%		Players2 = [{Pid, Alias, [game, Game]} || {Pid, Alias} <- Players],
+		srv ! {setStatus, Players},
 		NewPlayerList = lists:filter(fun({P, _, _}) -> lists:keymember(P, 1, Players) == false end, PlayerList),
-		spawn(gameAPI, init, [Game, Players])
-
+		GamePid = spawn(gameAPI, init, [Game, Players]),
+		playersToGameMode(GamePid, Players)
     end,
     room(Game, GameName, NewPlayerList).
 
@@ -105,15 +106,23 @@ sendMessage([{H, User, _} | T], Alias, Message) ->
     end,
     sendMessage(T, Alias, Message).
 
+playersToGameMode(_, []) ->
+	ok;
+playersToGameMode(GamePid, [{Pid, Alias} | Players]) ->
+	srv ! {debug, "Making "++Alias++" go into game mode"},
+	Pid ! {game, GamePid},
+	playersToGameMode(GamePid, Players).
+
+
 sendToClient(Pid, Message) ->
     Pid ! {directMessage, Message}.
 
-sendChallange(Aliases, Origin) ->
+sendChallange(Aliases, Origin, GameRoomPid) ->
 	Alias = hd(Aliases),
 	srv ! {getPid, Alias, self()},
 	receive
 		{returnPid, nomatch} ->
 			sendToClient(Origin, "ERROR: No such player available\n");
 		{returnPid, Pid} ->
-			Pid ! {challange, Origin}
+			Pid ! {challange, GameRoomPid, Origin}
 	end.

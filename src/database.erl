@@ -40,7 +40,7 @@ database() ->
 			[] -> 
 				Origin ! {returnPid, nomatch};
 			_ ->
-				Origin ! {returnPid, hd(Pids)}
+				Origin ! {returnPid, hd(hd(Pids))}
 		end;
 	
 	{getSameStatus, Status, Origin} ->
