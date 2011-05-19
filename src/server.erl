@@ -100,7 +100,7 @@ readLines(File, Games) ->
 
 
 %% @doc Spawns a game room for all games in a list
-%% @spec spawnGameRooms(List) -> ok
+%% @spec spawnGameRooms(GameList, ResultingList) -> ResultingList
 %% @hidden
 spawnGameRooms([],GameList) -> GameList;
 spawnGameRooms([{GameModule, DisplayName}|T],GameList) ->
