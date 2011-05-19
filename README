@@ -2,3 +2,4 @@ Run instruction:
 1) make
 2) make server
 3) make client
+4) (Optional) Additional clients on local machine? erl -noshell -sname somename -s client init
