@@ -24,7 +24,8 @@ run(Game, State, Players, [NextPlayer | RemainingPlayers]) ->
 	end.
 
 finish({_, WinnerAlias}, Players) ->
-	print("The winner is "++WinnerAlias++"! Congratulations!\n", Players).
+	print("The winner is "++WinnerAlias++"! Congratulations!\n", Players),
+	send({finish}, Players).
 
 draw(Players) ->
 	print("The game is a draw. All are winners!\n",Players).
@@ -41,6 +42,12 @@ getNumber(Pid) ->
 		{input, Input} ->
 			Input
 	end.
+
+send(_, []) ->
+	ok;
+send(Output, [{Pid, _} | Players]) ->
+	Pid ! Output,
+	send(Output, Players).
 
 print(_, []) ->
 	ok;
