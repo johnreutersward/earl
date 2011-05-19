@@ -5,7 +5,7 @@
 -export([init/2, trap/2]).
 
 %% @doc Initiates the client_supervisor.
-%% @spec init() -> ok
+%% @spec init(ServerPid, ClientHandlerPid) -> ok
 
 init(ServerPid, ClientHandlerPid) -> 
 	link(ClientHandlerPid),
@@ -13,7 +13,7 @@ init(ServerPid, ClientHandlerPid) ->
 	trap(ServerPid,ClientHandlerPid).
 
 %% @doc Notifies the server if a client dies.
-%% @spec loop() -> ok
+%% @spec trap(ServerPid, ClientHandlerPid) -> ok
 
 trap(ServerPid,ClientHandlerPid) ->
 	receive
