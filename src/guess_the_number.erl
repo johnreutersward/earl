@@ -13,6 +13,7 @@ init(Players) ->
 nextTurn({_,The_number,_},{Next_player_Pid,Next_player_Alias},Players) ->
     gameAPI:print(Next_player_Alias++":s turn, guess the number: ",Players),
     The_guess = (gameAPI:getNumber(Next_player_Pid)),
+    gameAPI:print(Next_player_Alias++" guessed "++integer_to_list(The_guess)++"\n",Players),
     case The_guess of
 	The_number ->
 	    gameAPI:print("That's the right number!!\n",Players),
