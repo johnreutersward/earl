@@ -11,9 +11,11 @@ init(Players) ->
     {0,The_number,Current}.
 
 nextTurn({_,The_number,_},{Next_player_Pid,Next_player_Alias},Players) ->
-    gameAPI:print(Next_player_Alias++":s turn, guess the number: ",Players),
+    gameAPI:print(Next_player_Alias++":s turn\n",Players),
+    gameAPI:print("guess the number: ",[{Next_player_Pid,Next_player_Alias}]),
     The_guess = (gameAPI:getNumber(Next_player_Pid)),
-    gameAPI:print(Next_player_Alias++" guessed "++integer_to_list(The_guess)++"\n",Players),
+    Remaining= lists:keydelete(Next_player_Pid,1,Players),
+    gameAPI:print(Next_player_Alias++" guessed "++integer_to_list(The_guess)++"\n",Remaining),
     case The_guess of
 	The_number ->
 	    gameAPI:print("That's the right number!!\n",Players),
