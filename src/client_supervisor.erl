@@ -8,7 +8,6 @@
 %% @spec init() -> ok
 
 init(ServerPid, ClientHandlerPid) -> 
-	io:format("Starting...~n"),
 	link(ClientHandlerPid),
 	process_flag(trap_exit, true),
 	trap(ServerPid,ClientHandlerPid).
