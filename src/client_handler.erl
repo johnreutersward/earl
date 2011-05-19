@@ -78,7 +78,7 @@ game_menu([], Num, Alias, GameList) ->
     io:format(IntString ++ " - Back to Main Menu~n?> ", []),
     Input = getNumber(), 
     case(Input) of
-	error ->
+	{error} ->
 	    io:format("Illegal command!~n", []),
 	    game_menu(Alias);
 	_ when Input > 0 , Input < Num ->
@@ -146,9 +146,9 @@ receiver(GameList,Num,Alias) ->
 		end,
 		receiver(GameList, Num, Alias);
 
-	{declineChallenge, Alias} ->
-		io:format("~s has declined your challenge.~n", [Alias]),
-		receiver(GameList, Num, Alias);
+	{declineChallenge, OriginAlias} ->
+		io:format("~s has declined your challenge.~n", [OriginAlias]),
+		receiver(GameList, Num, OriginAlias);
 	{game, GamePid} ->
 		io:format("GameMode request received", []),
 		{game, GamePid};
@@ -181,7 +181,7 @@ getInput() ->
 getNumber() ->
     case io_lib:fread("~d", getInput()) of
 	{ok, Num, _} -> hd(Num);
-	{error, _} -> error
+	{error, _} -> {error}
     end.
 
 %% @doc takes away "\n" from the string.
