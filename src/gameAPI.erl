@@ -30,13 +30,15 @@ run(Game, State, Players, [NextPlayer | RemainingPlayers]) ->
 %% @doc Sends a "win message" to all players and that the game has ended.
 %% @spec finish(Player, Playerlist) -> ok
 finish({_, WinnerAlias}, Players) ->
-	print("The winner is "++WinnerAlias++"! Congratulations!\n", Players),
+	print("The winner is "++WinnerAlias++"!\n", Players),
 	send({finish}, Players).
 
 %% @doc Sends a "draw message" to all players in the Playerlist.
 %% @spec draw(Playerlist) -> ok
 draw(Players) ->
-	print("The game is a draw. All are winners!\n",Players).
+	print("The game is a draw. Computer wins 0100100001000001!\n",Players),
+	send({finish}, Players).
+
 
 %% @doc Asks a playter for an input.
 %% @spec getInput(Pid) -> Input
