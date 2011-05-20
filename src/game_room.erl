@@ -115,14 +115,14 @@ playersToGameMode(GamePid, [{Pid, Alias} | Players]) ->
 
 
 sendToClient(Pid, Message) ->
-    Pid ! {directMessage, Message}.
+    Pid ! {message, "", Message}.
 
-sendChallenge(Aliases, Origin, GameRoomPid) ->
+sendChallenge(Aliases, {OriginPid, OriginAlias}, GameRoomPid) ->
 	Alias = hd(Aliases),
 	srv ! {getPid, Alias, self()},
 	receive
 		{returnPid, nomatch} ->
-			sendToClient(Origin, "ERROR: No such player available\n");
+			sendToClient(OriginPid, "ERROR: No such player available\n");
 		{returnPid, Pid} ->
-			Pid ! {challenge, GameRoomPid, Origin}
+			Pid ! {challenge, GameRoomPid, {OriginPid, OriginAlias}}
 	end.

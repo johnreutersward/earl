@@ -149,7 +149,6 @@ receiver(GameList,Num,Alias) ->
 		io:format("~s has declined your challenge.~n", [OriginAlias]),
 		receiver(GameList, Num, OriginAlias);
 	{game, GamePid} ->
-		io:format("GameMode request received", []),
 		{game, GamePid};
 	{printPlayers, PlayerList} ->
 	    printPlayers(PlayerList),
