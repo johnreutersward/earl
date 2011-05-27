@@ -4,7 +4,7 @@
 -module(client_supervisor).
 -export([init/2, trap/2]).
 
-%% @doc Initiates the client_supervisor.
+%% @doc Initiates the client_supervisor to trap exits from ClientHandlerPid.
 %% @spec init(ServerPid, ClientHandlerPid) -> ok
 
 init(ServerPid, ClientHandlerPid) -> 
@@ -12,7 +12,7 @@ init(ServerPid, ClientHandlerPid) ->
 	process_flag(trap_exit, true),
 	trap(ServerPid,ClientHandlerPid).
 
-%% @doc Notifies the server if a client dies.
+%% @doc Notifies the server with PID ServerPid if the client dies.
 %% @spec trap(ServerPid, ClientHandlerPid) -> ok
 
 trap(ServerPid,ClientHandlerPid) ->
