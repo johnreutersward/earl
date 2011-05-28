@@ -10,4 +10,5 @@ doccer() -> edoc:application(earliweb, ".", []),
 %%		init:stop().
 %%	  
 tester() -> client_handler:runtest(),
-			init:stop().
+	    tictactoe:runtest(),
+	    init:stop().
