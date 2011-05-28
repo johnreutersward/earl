@@ -9,6 +9,7 @@
 %% @doc Starts a game instance for the players in the Playerlist.
 %% @spec init(Game, Playerlist) -> ok
 init(Game, Players) ->
+	lists:map( fun(X) -> erlang:monitor(process, element(1,X)) end, Players),
 	State = Game:init(Players),
 	run(Game, State, Players, []).
 
@@ -46,7 +47,9 @@ getInput(Pid) ->
 	Pid ! {input},
 	receive
 		{input, Input} ->
-			Input
+			Input;
+		{'DOWN', _Reference, process, Pid, _Reason} ->
+			Pid
 	end.
 
 %% @doc Sends a request to the specified Pid for a numeric input. The function returns either the read input or an error if an invalid character was specified.
@@ -55,7 +58,9 @@ getNumber(Pid) ->
 	Pid ! {inputNumber},
 	receive
 		{input, Input} ->
-			Input
+			Input;
+		{'DOWN', _Reference, process, Pid, _Reason} ->
+			Pid
 	end.
 
 %% @doc Sends a message to all players in list.
