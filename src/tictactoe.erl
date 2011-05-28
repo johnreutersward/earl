@@ -112,7 +112,14 @@ nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},
     end,
     Input = getInput(PlayerPid),
     case Input of
-	_ when Input /= "a1" ,
+		_ when is_pid(Input) ->
+			if
+				Input == Player1 ->
+					State = {[{Player1, "X"}, {Player2, "O"}], [a, "O", "O", "O"], [b, B1, B2, B3], [c,C1,C2,C3]};
+				true ->
+					State = {[{Player1, "X"}, {Player2, "O"}], [a, "X", "X", "X"], [b, B1, B2, B3], [c,C1,C2,C3]}
+			end;
+		_ when Input /= "a1" ,
 	       Input /= "a2" ,
 	       Input /= "a3" ,
 	       Input /= "b1" ,
