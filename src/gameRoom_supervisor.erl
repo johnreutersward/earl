@@ -1,3 +1,11 @@
+%% @author Tobias.Ericsson.0701@student.uu.se
+%% @author Andreas.Hammar.5781@student.uu.se
+%% @author Gabriella.Lundborg.6304@student.uu.se
+%% @author Emma.Rangert.2142@student.uu.se
+%% @author John.Reuterswärd.8971@student.uu.se
+%% @author Simon.Young.0963@student.uu.se
+%% @doc A supervisor that restarts a game room if it dies and updates the database.
+
 -module(gameRoom_supervisor).
 -export([init/2, linkRooms/3, trap/2, restart_room/2]).
 
