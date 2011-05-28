@@ -1,9 +1,9 @@
-%% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
-%% @author Andreas Hammar <andreashammar@gmail.com>
-%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
-%% @author Emma Rangert <emma.rangert@gmail.com>
-%% @author John Reuterswärd <rojters@gmail.com>
-%% @author Simon Young <youngen.simon@gmail.com>
+%% @author Tobias.Ericsson.0701@student.uu.se
+%% @author Andreas.Hammar.5781@student.uu.se
+%% @author Gabriella.Lundborg.6304@student.uu.se
+%% @author Emma.Rangert.2142@student.uu.se
+%% @author John.Reuterswärd.8971@student.uu.se
+%% @author Simon.Young.0963@student.uu.se
 %% @doc The Client module. This module allows a user to connect to Earl's Game Club
 %% and speak to that server with client functions.
 

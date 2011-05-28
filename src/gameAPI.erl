@@ -8,13 +8,15 @@
 
 %% @doc Starts a game instance for the players in the Playerlist.
 %% @spec init(Game, Playerlist) -> ok
+
 init(Game, Players, GameRoomPid) ->
 	lists:map( fun(X) -> erlang:monitor(process, element(1,X)) end, Players),
 	State = Game:init(Players),
 	run(Game, State, Players, [], GameRoomPid).
 
-%% @doc Checks if the game is over and sends that information to all players OR runs a newstate of the game.
+%% @doc Checks if the game is over and sends that information to all players OR runs a new state of the game.
 %% @spec run(Game, State, Playerlist, Playerlist) -> ok
+
 run(Game, State, Players, [], GameRoomPid) ->
 	run(Game, State, Players, Players, GameRoomPid);
 run(Game, State, Players, [NextPlayer | RemainingPlayers], GameRoomPid) ->
@@ -30,6 +32,7 @@ run(Game, State, Players, [NextPlayer | RemainingPlayers], GameRoomPid) ->
 
 %% @doc Sends a "win message" to all players and that the game has ended.
 %% @spec finish(Player, Playerlist) -> ok
+
 finish({_, WinnerAlias}, Players, Game, GameRoomPid) ->
 	print("The winner is "++WinnerAlias++"!\n", Players),
 	GameRoomPid ! {finish, WinnerAlias},
@@ -37,13 +40,15 @@ finish({_, WinnerAlias}, Players, Game, GameRoomPid) ->
 
 %% @doc Sends a "draw message" to all players in the Playerlist.
 %% @spec draw(Playerlist) -> ok
+
 draw(Players) ->
 	print("The game is a draw. Computer wins 0100100001000001!\n",Players),
 	send({finish}, Players).
 
 
-%% @doc Asks a playter for an input.
+%% @doc Asks a player for an input. If that player has died that players Pid is returned.
 %% @spec getInput(Pid) -> Input
+
 getInput(Pid) ->
 	Pid ! {input},
 	receive
@@ -53,8 +58,9 @@ getInput(Pid) ->
 			Pid
 	end.
 
-%% @doc Sends a request to the specified Pid for a numeric input. The function returns either the read input or an error if an invalid character was specified.
+%% @doc Sends a request to the specified Pid for a numeric input. The function returns either the read input or an error if an invalid character was specified. If that player has died that players Pid is returned.
 %% @spec getNumber(Pid) -> Integer | {error} 
+
 getNumber(Pid) ->
 	Pid ! {inputNumber},
 	receive
@@ -66,6 +72,7 @@ getNumber(Pid) ->
 
 %% @doc Sends a message to all players in list.
 %% @spec send(Output, Playerslist) -> ok
+
 send(_, []) ->
 	ok;
 send(Output, [{Pid, _} | Players]) ->
@@ -74,6 +81,7 @@ send(Output, [{Pid, _} | Players]) ->
 
 %% @doc Sends a message (to be printed) to all players in list. 
 %% @spec print(Output, Players) -> ok
+
 print(_, []) ->
 	ok;
 print(Output, [{Pid,Alias} | Players]) ->
@@ -81,7 +89,9 @@ print(Output, [{Pid,Alias} | Players]) ->
 	print(Output, Players).
 
 %% @doc Gets the nth player from the list.
+%% @spec init() -> ok
 %% @spec getPlayer(Int, Playerlist) -> Player
+
 getPlayer(Int,[]) ->
     ok;
 getPlayer(Int,Players) ->

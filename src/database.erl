@@ -1,17 +1,17 @@
-%% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
-%% @author Andreas Hammar <andreashammar@gmail.com>
-%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
-%% @author Emma Rangert <emma.rangert@gmail.com>
-%% @author John Reuterswärd <rojters@gmail.com>
-%% @author Simon Young <youngen.simon@gmail.com>
-%% @doc this is the database that hold all the info of the clients currently
+%% @author Tobias.Ericsson.0701@student.uu.se
+%% @author Andreas.Hammar.5781@student.uu.se
+%% @author Gabriella.Lundborg.6304@student.uu.se
+%% @author Emma.Rangert.2142@student.uu.se
+%% @author John.Reuterswärd.8971@student.uu.se
+%% @author Simon.Young.0963@student.uu.se
+%% @doc this is the database that holds all the information of the clients currently
 %% in the database.
-
 
 -module(database).
 -export([init/0, clients/0, printClients/1, printNumClients/0]).
 
-%% @doc initiates the database.
+%% @doc Initiates one database for the connected clients, one database for the available games 
+%% and then initiates the database function. 
 %% @spec init() -> database()
 
 init() ->
@@ -19,7 +19,7 @@ init() ->
     ets:new(gamesTable, [set, named_table]),
     database().
 
-%% @doc the database.
+%% @doc The database function receives messages from the server and pass them on to the requesting process. 
 %% @spec database() -> database()
 
 database() ->
@@ -81,7 +81,7 @@ database() ->
     end,
     database().
 
-%% @doc Check if Alias is already in database, sends an answer to the asking process.
+%% @doc The function checks whether Alias is already in the clientTable database and then sends an answer to the asking process.
 %% @hidden
 
 checkAlias(Alias, Origin) ->
@@ -97,7 +97,7 @@ checkAlias(Alias, Origin) ->
     end, 
     ok.
 
-%% @doc prints all the clints in the database.
+%% @doc This function prints all the clients in the database.
 %% @spec clients() -> printClients(ClientList)
 %% @hidden
 
@@ -108,7 +108,7 @@ clients() ->
 	    printClients(ClientList)
     end.
 
-%% @doc prints all the clients in the database
+%% @doc This function prints all the clients in the database.
 %% @hidden
 
 printClients([]) ->
@@ -117,7 +117,7 @@ printClients([{Pid, Alias, Status} | T]) ->
     io:format("{~w, ~s, ~w}~n", [Pid, Alias, Status]),
     printClients(T).
 
-%% @doc prints the number of clients currently online.
+%% @doc This function prints the number of clients currently online.
 %% @spec printNumClients() -> {getNumClients, self()}
 
 printNumClients() ->
