@@ -1,9 +1,9 @@
-%% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
-%% @author Andreas Hammar <andreashammar@gmail.com>
-%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
-%% @author Emma Rangert <emma.rangert@gmail.com>
-%% @author John Reuterswärd <rojters@gmail.com>
-%% @author Simon Young <youngen.simon@gmail.com>
+%% @author Tobias.Ericsson.0701@student.uu.se
+%% @author Andreas.Hammar.5781@student.uu.se
+%% @author Gabriella.Lundborg.6304@student.uu.se
+%% @author Emma.Rangert.2142@student.uu.se
+%% @author John.Reuterswärd.8971@student.uu.se
+%% @author Simon.Young.0963@student.uu.se
 %% @doc This module has all the functions that the client needs on the server side.
 %% This functions gives the user all the information and ability to interact with other users
 %% and the server.
@@ -12,7 +12,7 @@
 -export([init/1, runtest/0, gameRoom/4,receiver/3]).
 -include_lib("eunit/include/eunit.hrl").
 
-%% @doc initiates the client handler.
+%% @doc Initiates the client handler.
 %% @spec init(ClientPid) -> create_alias(ClientPid)
 
 init(ClientPid) ->
@@ -20,7 +20,7 @@ init(ClientPid) ->
     numConnected(),
     create_alias(ClientPid).
 
-%% @doc creates a user, when the client comes online.
+%% @doc Creates a user, when the client comes online.
 %% @spec create_alias(ClientPid) -> main_menu(ClientPid)
 %% @hidden
 
@@ -38,8 +38,9 @@ create_alias(ClientPid) ->
 	    create_alias(ClientPid)
     end.
 
-%% @doc this is the main menu that the user sees upon entering the server.
-%% from this function the user can enter game_menu() or quit().
+%% @doc This is the main menu that the user sees upon entering the server.
+%% From this function the user can enter game_menu() or quit().
+%% @spec main_menu(ClientPid, Alias) -> ok
 
 main_menu(ClientPid, Alias) ->
     io:format("~n --Main Menu-- ~n", []),
@@ -54,25 +55,25 @@ main_menu(ClientPid, Alias) ->
 	    main_menu(ClientPid, Alias);
 	"2" ->
 	    numConnected(),
-		main_menu(ClientPid,Alias);
+	    main_menu(ClientPid,Alias);
 	"3" ->
 	    help(ClientPid,Alias);
 	"4" ->
 	    quit(ClientPid);
 	_ ->
-		io:format("~nIllegal command~n",[]),
+	    io:format("~nIllegal command~n",[]),
 	    main_menu(ClientPid,Alias)
     end.
 
-%% @doc prints out the game menu for the user, and enables the user to connect to a game room.
+%% @doc Prints out the game menu for the user and enables the user to connect to a game room.
+%% @spec game_menu(Alias) -> ok.
 
 game_menu(Alias) ->
-	db ! {getGamesList, self()},
-	receive
-		{gamesList, GameList} ->
-			game_menu(GameList, 1, Alias, GameList)
-	end.
-
+    db ! {getGamesList, self()},
+    receive
+	{gamesList, GameList} ->
+	    game_menu(GameList, 1, Alias, GameList)
+    end.
 game_menu([], Num, Alias, GameList) -> 
     IntString = integer_to_list(Num),
     io:format(IntString ++ " - Back to Main Menu~n?> ", []),
@@ -100,11 +101,12 @@ game_menu([], Num, Alias, GameList) ->
 	    io:format("Illegal command!~n", []),
 	    game_menu(GameList, 1, Alias,GameList)
     end;
-
 game_menu([{_, DisplayName,_} | GameListIter], Num, Alias, GameList) ->
     io:format("~p - ~s ~n", [Num, DisplayName]),
     game_menu(GameListIter, Num+1, Alias,GameList).
 
+%% @doc This function allows the player to send messages to the game room.
+%% @hidden
 
 gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias, 0) ->
     srv ! {enterGameRoom, Alias, ClientPid, {GameModule, RoomPid}},
@@ -113,16 +115,25 @@ gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias,1) ->
     RoomPid ! {input, ClientPid, Alias, getInput()},
     gameRoom({GameModule, GameName, RoomPid}, ClientPid, Alias, 1).
 
+%% @doc prints out all the players in the list. 
+%% @spec printPlayers(Players) -> ok
+
 printPlayers([]) -> 
 	io:format("~n", []);
 printPlayers([Player | PlayerList]) ->
     io:format("~s, ", [Player]),
     printPlayers(PlayerList).
 
+%% @doc prints out the high-score
+%% @spec printHighScore(List) -> ok
+
 printHighScore([]) -> ok;
 printHighScore([{Score, Alias} | HighScore]) ->
 	io:format("~w           ~s~n", [Score, Alias]),
 	printHighScore(HighScore).
+
+%% @doc Terminates a client when it requests to leave the server. 
+%% @spec quit(ClientPid) -> ok
 
 quit(ClientPid) ->
     io:format("~nBye!~n",[]),
@@ -168,6 +179,7 @@ receiver(GameList,Num,Alias) ->
 %% @doc shows number of clients connected to the server.
 %% @spec numConnected() -> {getNumCluents,self()}
 %% @hidden
+
 numConnected() ->
     srv ! {getNumClients, self()},
     receive
@@ -176,6 +188,7 @@ numConnected() ->
     after 1000 ->
 	    io:format("Failed to receive number of clients~n", [])
     end.
+
 %% @doc gets input from user.
 %% @spec getInput() -> trim(Input)
 %% @hidden
@@ -186,6 +199,7 @@ getInput() ->
 
 %% @doc askes the user for an int.
 %% @hidden
+
 getNumber() ->
     case io_lib:fread("~d", getInput()) of
 	{ok, Num, _} -> hd(Num);
@@ -197,6 +211,7 @@ getNumber() ->
 
 trim(String) ->
     string:strip(string:strip(String, both, $\n)).
+
 %% @doc sends {quit,self()} to the server.
 %% @spec quit(ClientPid) -> {quit}
 %% @hidden
@@ -217,6 +232,8 @@ help(ClientPid,Alias) ->
     io:format("Press [ENTER] to go back to Main Menu~n", []),
     getInput(),    
     main_menu(ClientPid,Alias).
+
+%% @hidden
 
 gameMode(GamePid) ->
     receive
