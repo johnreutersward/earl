@@ -7,7 +7,7 @@
 %% @doc this module contains all the functions that is related to the game room.
 
 -module(game_room).
--export([init/2, handleInput/5, commandParser/5, sendChallenge/3, printPlayers/1, sendToClient/2]).
+-export([init/2, handleInput/6, commandParser/6, sendChallenge/3, printPlayers/1, sendToClient/2]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the game room
@@ -18,49 +18,62 @@ init(Game, GameName) ->
     srv ! {getSameStatus, [game, Game], self()},
     receive
 	{statusList, PlayersList} ->
-	    room(Game, GameName, PlayersList)
+		room(Game, GameName, PlayersList, [])
     end.
 	
 %% @doc the game room, it handles data between users.
 
-room(Game, GameName, PlayerList) ->
+room(Game, GameName, PlayerList, HighScore) ->
     receive
 	{newPlayer, Pid, Alias} ->
 	    srv ! {debug, "New player added to "++GameName++" room"},
 	    Pid ! {message, GameName, "Welcome to "++GameName++" game room!\n\n"
-		   ++"Available commands are: /players, /quit, /challenge\n"},
+		   ++"Available commands are: /players, /quit, /challenge, /high-score\n"},
 	    sendMessage(PlayerList, "", Alias++" has joined the room"),
-	    NewPlayerList = [{Pid, Alias, [game, Game]} | PlayerList];
+	    NewPlayerList = [{Pid, Alias, [game, Game]} | PlayerList],
+		NewHighScore = HighScore;
 	{quitPlayer, Pid, Alias} ->
 	    NewPlayerList = lists:keydelete(Pid, 1, PlayerList),
 	    Pid ! {back},
 	    srv ! {setStatus, Pid, Alias, [main]},
-	    sendMessage(PlayerList, "", Alias++" has left the room.");
+	    sendMessage(PlayerList, "", Alias++" has left the room."),
+		NewHighScore = HighScore; 
 	{input, Origin, Alias, Input} ->
 	    srv ! {debug, "Handle player input "++GameName++" room."},
-	    spawn(game_room,handleInput, [self(), Input, Origin, Alias, PlayerList]),
-	    NewPlayerList = PlayerList;	
+	    spawn(game_room,handleInput, [self(), Input, Origin, Alias, PlayerList, HighScore]),
+	    NewPlayerList = PlayerList,
+		NewHighScore = HighScore;
+	{finish, WinnerAlias} ->
+		if 
+			HighScore == [] ->
+				NewHighScore = [{1, WinnerAlias}];
+		true ->
+				NewHighScore = updateHighScore(WinnerAlias, HighScore)
+		end,
+		NewPlayerList = PlayerList;
 	{challenge, Aliases, Origin} ->
 		srv ! {debug, "Challenging another player."},
 		spawn(game_room, sendChallenge, [Aliases, Origin, self()]),
-		NewPlayerList = PlayerList;
+		NewPlayerList = PlayerList,
+		NewHighScore = HighScore;
 	{initiateGame, Players} ->
 		srv ! {debug, "GameRoom received initiateGame, attempting to start game module"},
 %		Players2 = [{Pid, Alias, [game, Game]} || {Pid, Alias} <- Players],
 		srv ! {setStatus, Players},
 		NewPlayerList = lists:filter(fun({P, _, _}) -> lists:keymember(P, 1, Players) == false end, PlayerList),
-		GamePid = spawn(gameAPI, init, [Game, Players]),
-		playersToGameMode(GamePid, Players)
+		GamePid = spawn(gameAPI, init, [Game, Players, self()]),
+		playersToGameMode(GamePid, Players),
+		NewHighScore = HighScore
     end,
-    room(Game, GameName, NewPlayerList).
+    room(Game, GameName, NewPlayerList, NewHighScore).
 
 %% @doc handles the input depending on if it starts with "/" or not
 %% @hidden
 
-handleInput(RoomPid, Input, Origin, Alias, PlayerList) ->
+handleInput(RoomPid, Input, Origin, Alias, PlayerList, HighScore) ->
     if 
 	[hd(Input)] == "/" ->
-	    commandParser(RoomPid,Input,Origin,Alias, PlayerList);
+	    commandParser(RoomPid,Input,Origin,Alias, PlayerList, HighScore);
 	true ->
 %	    spawn(game_room,sendMessage,[PlayerList,Alias,Input])
 	    ok
@@ -69,7 +82,7 @@ handleInput(RoomPid, Input, Origin, Alias, PlayerList) ->
 %% @doc this function decides which command the user wants to input.
 %% @hidden
 	
-commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList) ->
+commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList, HighScore) ->
     [Command | Params] = string:tokens(Input, " "),
     case Command of
 	"challenge" ->
@@ -81,6 +94,8 @@ commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList) ->
 	    Origin ! {printPlayers, AliasList};
 	"Nyan" ->
 		8/0;
+	"high-score" ->
+		Origin ! {printHighScore, HighScore};
 	_ ->
 	    Origin ! {message, "", "Invalid Command."}
     end.
@@ -112,6 +127,16 @@ playersToGameMode(GamePid, [{Pid, Alias} | Players]) ->
 	srv ! {debug, "Making "++Alias++" go into game mode"},
 	Pid ! {game, GamePid},
 	playersToGameMode(GamePid, Players).
+
+updateHighScore(WinnerAlias, []) -> 
+	[{1, WinnerAlias}];
+updateHighScore(WinnerAlias, [{Score, Alias} | HighScore]) ->
+	if
+		WinnerAlias == Alias ->
+			[{Score + 1, Alias} | HighScore];
+	true ->
+		[{Score, Alias} | updateHighScore(WinnerAlias, HighScore)]
+	end.
 
 
 sendToClient(Pid, Message) ->

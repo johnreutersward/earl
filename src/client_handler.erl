@@ -119,6 +119,11 @@ printPlayers([Player | PlayerList]) ->
     io:format("~s, ", [Player]),
     printPlayers(PlayerList).
 
+printHighScore([]) -> ok;
+printHighScore([{Score, Alias} | HighScore]) ->
+	io:format("~w           ~s~n", [Score, Alias]),
+	printHighScore(HighScore).
+
 quit(ClientPid) ->
     io:format("~nBye!~n",[]),
     srv ! {quit, self()},
@@ -148,6 +153,11 @@ receiver(GameList,Num,Alias) ->
 	{declineChallenge, OriginAlias} ->
 		io:format("~s has declined your challenge.~n", [OriginAlias]),
 		receiver(GameList, Num, OriginAlias);
+	{printHighScore, HighScore} ->
+		io:format("==== HIGH SCORE ====~n"),
+		io:format("SCORE           NAME~n"),
+		printHighScore(lists:reverse(lists:keysort(1, HighScore))),
+		receiver(GameList, Num, Alias);
 	{game, GamePid} ->
 		{game, GamePid};
 	{printPlayers, PlayerList} ->
@@ -228,6 +238,7 @@ gameMode(GamePid) ->
 
 %% @hidden
 runtest() ->
+	io:format("Now testing client_handler\n"),
     test(),
     init:stop().
 

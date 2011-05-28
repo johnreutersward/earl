@@ -1,6 +1,6 @@
 
 -module(gameAPI).
--export([init/2, getInput/1, getNumber/1, print/2,getPlayer/2]).
+-export([init/3, getInput/1, getNumber/1, print/2,getPlayer/2]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GameAPI functions 
@@ -8,30 +8,31 @@
 
 %% @doc Starts a game instance for the players in the Playerlist.
 %% @spec init(Game, Playerlist) -> ok
-init(Game, Players) ->
+init(Game, Players, GameRoomPid) ->
 	lists:map( fun(X) -> erlang:monitor(process, element(1,X)) end, Players),
 	State = Game:init(Players),
-	run(Game, State, Players, []).
+	run(Game, State, Players, [], GameRoomPid).
 
 %% @doc Checks if the game is over and sends that information to all players OR runs a newstate of the game.
 %% @spec run(Game, State, Playerlist, Playerlist) -> ok
-run(Game, State, Players, []) ->
-	run(Game, State, Players, Players);
-run(Game, State, Players, [NextPlayer | RemainingPlayers]) ->
+run(Game, State, Players, [], GameRoomPid) ->
+	run(Game, State, Players, Players, GameRoomPid);
+run(Game, State, Players, [NextPlayer | RemainingPlayers], GameRoomPid) ->
 	case Game:checkFinished(State, Players) of
 		{true, Winner} ->
-			finish(Winner, Players);
+			finish(Winner, Players, Game, GameRoomPid);
 		{draw} ->
 			draw(Players);
 		{false} ->
 			NewState = Game:nextTurn(State, NextPlayer, Players),
-			run(Game, NewState, Players, RemainingPlayers)
+			run(Game, NewState, Players, RemainingPlayers, GameRoomPid)
 	end.
 
 %% @doc Sends a "win message" to all players and that the game has ended.
 %% @spec finish(Player, Playerlist) -> ok
-finish({_, WinnerAlias}, Players) ->
+finish({_, WinnerAlias}, Players, Game, GameRoomPid) ->
 	print("The winner is "++WinnerAlias++"!\n", Players),
+	GameRoomPid ! {finish, WinnerAlias},
 	send({finish}, Players).
 
 %% @doc Sends a "draw message" to all players in the Playerlist.
