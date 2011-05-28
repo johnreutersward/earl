@@ -156,7 +156,7 @@ receiver(GameList,Num,Alias) ->
 	{printHighScore, HighScore} ->
 		io:format("==== HIGH SCORE ====~n"),
 		io:format("SCORE           NAME~n"),
-		printHighScore(lists:reverse(lists:keysort(1, HighScore))),
+		printHighScore(HighScore),
 		receiver(GameList, Num, Alias);
 	{game, GamePid} ->
 		{game, GamePid};
