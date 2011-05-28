@@ -1,10 +1,10 @@
-%% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
-%% @author Andreas Hammar <andreashammar@gmail.com>
-%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
-%% @author Emma Rangert <emma.rangert@gmail.com>
-%% @author John Reuterswärd <rojters@gmail.com>
-%% @author Simon Young <youngen.simon@gmail.com>
-%% @doc A game tic tac toe using a game API desinged for earls game club.
+%% @author Tobias.Ericsson.0701@student.uu.se
+%% @author Andreas.Hammar.5781@student.uu.se
+%% @author Gabriella.Lundborg.6304@student.uu.se
+%% @author Emma.Rangert.2142@student.uu.se
+%% @author John.Reuterswärd.8971@student.uu.se
+%% @author Simon.Young.0963@student.uu.se
+%% @doc A game of tic tac toe using a game API desinged for Earl's Game Club.
 
 -module(tictactoe).
 -export([init/1, checkFinished/2, nextTurn/3]).
@@ -14,7 +14,7 @@
 %% @doc Initiates a game of tic tac toe. It takes a list of players as a parameter
 %% and sends a welcome message to each player. The function returns the initial state of the game.
 %% A state is a quadruple with 4 lists in it. The first list has two tuples as elements and represents the
-%% players and which one of them starts. The other 3 lists represents the 3 diffrent rows of the game, each starting
+%% players and which one of them that starts. The other 3 lists represent the 3 diffrent rows of the game, each starting
 %% with a, b or c.
 %% @spec init(Players) -> State
 
@@ -32,7 +32,7 @@ init(Players) ->
 
 %% @doc This function checks the state of the game. It takes a state and a player list as parameters.
 %% The function analysis the state and detemines wheter the game is a draw, if a player has won or if the game is not
-%% finnished. The function returns a tupel based on what the result is.
+%% finnished. The function returns a tuple based on what the result is.
 %% @spec checkFinished(State,Players) -> {draw} | {false} | {true,Player}
 
 checkFinished({_,[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},Players) ->   
@@ -174,7 +174,7 @@ place(Move,Input,Player,State) ->
 
 %% @doc This function checks if the move made by the current player is legal or not. The function takes as parameters
 %% two strings and the state of the game. The first string, Move, is the move the player wants to do. Input is the mark of the player,
-%% i.e "X", "O". If the move was illgal the function returns the atom illegal, otherwise it returns the new state. 
+%% i.e "X", "O". If the move was illegal the function returns the atom illegal, otherwise it returns the new state. 
 %% @spec input(Move,Input,State,Players) -> illegal | NewState
 %% @hidden
 
@@ -247,7 +247,7 @@ input(Move,Input,{[{Pid1,Alias1},{Pid2,Alias2}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,
 
 
 %% @doc this function prints out the current state to each player playing the game.
-%% it takes two parameters, the state of the game and the playerlist.
+%% It takes two parameters, the state of the game and the playerlist.
 %% @spec printState(State,Players) -> ok
 %% @hidden
 
