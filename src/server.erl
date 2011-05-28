@@ -1,9 +1,9 @@
-%% @author Tobias Ericsson <tobiasericsson90@hotmail.com>
-%% @author Andreas Hammar <andreashammar@gmail.com>
-%% @author Gabriella Lundborg <gabriella_lundborg@hotmail.com>
-%% @author Emma Rangert <emma.rangert@gmail.com>
-%% @author John Reuterswärd <rojters@gmail.com>
-%% @author Simon Young <youngen.simon@gmail.com>
+%% @author Tobias.Ericsson.0701@student.uu.se
+%% @author Andreas.Hammar.5781@student.uu.se
+%% @author Gabriella.Lundborg.6304@student.uu.se
+%% @author Emma.Rangert.2142@student.uu.se
+%% @author John.Reuterswärd.8971@student.uu.se
+%% @author Simon.Young.0963@student.uu.se
 %% @doc This is the main server that handles all the communication between
 %% clients and clients to database the database.
 
@@ -11,7 +11,7 @@
 -export([init/0, runtest/0, getGame/1]).
 -include_lib("eunit/include/eunit.hrl").
 
-%% @doc initiates the server
+%% @doc Initiates the server. It spawns the database and game rooms with the available games. 
 %% @spec init() -> server()
 
 init() ->
@@ -32,8 +32,9 @@ init() ->
     db ! {setGamesList, GameList},
     server().
 
-%% @doc receives messages and realays them to the db or start other processes to handle the
+%% @doc Receives messages and relays them to the database or start other processes to handle the
 %% the message.
+%% @spec server() -> ok
 
 server() ->
     receive
@@ -71,12 +72,18 @@ server() ->
     end,
     server().
 
+%% @doc Gets the information of the requested game from the database.
+%% @spec getGame(GameModule) -> Game
+
 getGame(GameModule) ->
 	db ! {getGame, GameModule, self()},
 	receive
 		{gameInfo, Game} ->
 			Game
 	end.
+
+%% @doc Returns a list of all the games. If this fails, an error message is returned. 
+%% @spec loadGameList() -> GameList | {error, Reason}
 
 loadGamesList() ->
     case file:open("games.ini", read) of
@@ -85,6 +92,10 @@ loadGamesList() ->
 	{error, Reason} ->
 	    {error, Reason}
     end.
+
+%% @doc Adds a new game to the list of available games, if there is no game to add the current game list will be returned. 
+%% @spec readLines(File, Games) -> Games
+
 readLines(File, Games) ->
     case io:get_line(File, "") of
 	eof ->
@@ -99,15 +110,14 @@ readLines(File, Games) ->
     end.
 
 
-%% @doc Spawns a game room for all games in a list
+%% @doc Spawns a game room for all games in a list.
 %% @spec spawnGameRooms(GameList, ResultingList) -> ResultingList
 %% @hidden
+
 spawnGameRooms([],GameList) -> GameList;
 spawnGameRooms([{GameModule, DisplayName}|T],GameList) ->
     Pid = spawn(game_room, init, [GameModule, DisplayName]),
     spawnGameRooms(T,[{GameModule, DisplayName, Pid} | GameList]). 
-
-% Test cases
 
 %% @hidden
 
