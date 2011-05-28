@@ -110,24 +110,21 @@ nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},
 	PlayerPid == Player2 ->
 	    Move = "O"
     end,
-    PlayerPid ! {input},
-    receive
-	{input,Input} ->
-	    case Input of
-		_ when Input /= "a1" ,
-		       Input /= "a2" ,
-		       Input /= "a3" ,
-		       Input /= "b1" ,
-		       Input /= "b2" ,
-		       Input /= "b3" ,
-		       Input /= "c1" ,
-		       Input /= "c2" ,
-		       Input /= "c3" ->
-		    print(Input ++ " Is not a Move!\n",[{PlayerPid,Alias}]),
-		    State = nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},{PlayerPid,Alias},Players);
-		Input ->
-		    State = place(Input,Move,{PlayerPid,Alias},{[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]})
-	    end
+    Input = getInput(PlayerPid),
+    case Input of
+	_ when Input /= "a1" ,
+	       Input /= "a2" ,
+	       Input /= "a3" ,
+	       Input /= "b1" ,
+	       Input /= "b2" ,
+	       Input /= "b3" ,
+	       Input /= "c1" ,
+	       Input /= "c2" ,
+	       Input /= "c3" ->
+	    print(Input ++ " Is not a Move!\n",[{PlayerPid,Alias}]),
+	    State = nextTurn({[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]},{PlayerPid,Alias},Players);
+	Input ->
+	    State = place(Input,Move,{PlayerPid,Alias},{[{Player1,"X"},{Player2,"O"}],[a,A1,A2,A3],[b,B1,B2,B3],[c,C1,C2,C3]})
     end,
     if
 	State == illegalmove ->
