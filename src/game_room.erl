@@ -48,7 +48,7 @@ room(Game, GameName, PlayerList, HighScore) ->
 			HighScore == [] ->
 				NewHighScore = [{1, WinnerAlias}];
 		true ->
-				NewHighScore = updateHighScore(WinnerAlias, HighScore)
+			NewHighScore = lists:reverse(lists:keysort(1,(updateHighScore(WinnerAlias, HighScore))))
 		end,
 		NewPlayerList = PlayerList;
 	{challenge, Aliases, Origin} ->
