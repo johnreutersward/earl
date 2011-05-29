@@ -1,8 +1,9 @@
 -module(makeutils).
 -export([doccer/0, tester/0]).
 
-doccer() -> edoc:application(earliweb, ".", []),
-		  init:stop().
+doccer() -> 
+edoc:application(earliweb, ".", []),
+	init:stop().
 
 %% Add your modules with complete test-suites. Make sure you have a function runtest/0:
 %% runtest() ->
@@ -10,6 +11,9 @@ doccer() -> edoc:application(earliweb, ".", []),
 %%		test(),
 %%		init:stop().
 %%	  
-tester() -> client_handler:runtest(),
-			tictactoe:runtest(),
-			init:stop().
+tester() -> 
+	client_handler:runtest(),
+	tictactoe:runtest(),
+	guessTheNumber:runtest(),
+	client:runtest(),
+	init:stop().
