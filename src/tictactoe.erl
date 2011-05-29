@@ -7,7 +7,7 @@
 %% @doc A game of tic tac toe using a game API desinged for Earl's Game Club.
 
 -module(tictactoe).
--export([init/1, checkFinished/2, nextTurn/3]).
+-export([init/1, checkFinished/2, nextTurn/3, runtest/0]).
 -import(gameAPI, [getInput/1,print/2,getPlayer/2]).
 -include_lib("eunit/include/eunit.hrl").
 
