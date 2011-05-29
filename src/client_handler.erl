@@ -28,7 +28,6 @@ create_alias(ClientPid) ->
     io:format("Input a Username: ", []),
     Alias = getInput(),
     srv ! {checkAlias, Alias, self()},
-    io:format("Handler: Waiting for server confirmation~n", []),
     receive
 		{aliasValid} ->	
 	    srv ! {setStatus, self(), Alias, [main]},
