@@ -16,7 +16,7 @@
 %% @spec init(ClientPid) -> create_alias(ClientPid)
 
 init(ClientPid) ->
-    io:format("~n-- Welcome to Earl's Game Club!~n", []),
+    io:format("~n-- Welcome to Earl's Game Club! --~n", []),
     numConnected(),
     create_alias(ClientPid).
 
