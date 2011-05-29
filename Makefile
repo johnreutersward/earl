@@ -33,7 +33,7 @@ clean:
 
 test: all
 	@echo "Running testcases"
-	@$(TESTER)
+	$(TESTER)
 	@echo "All done"
 
 
