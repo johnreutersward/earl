@@ -7,7 +7,7 @@
 %% @doc An API of functions needed when designing a game. 
 
 -module(gameAPI).
--export([init/3, getInput/1, getNumber/1, print/2,getPlayer/2]).
+-export([init/3, getInput/1, getNumber/1, print/2, getPlayer/2]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GameAPI functions 
@@ -29,7 +29,7 @@ run(Game, State, Players, [], GameRoomPid) ->
 run(Game, State, Players, [NextPlayer | RemainingPlayers], GameRoomPid) ->
     case Game:checkFinished(State, Players) of
 	{true, Winner} ->
-	    finish(Winner, Players, Game, GameRoomPid);
+	    finish(Winner, Players, GameRoomPid);
 	{draw} ->
 	    draw(Players);
 	{false} ->
@@ -40,7 +40,7 @@ run(Game, State, Players, [NextPlayer | RemainingPlayers], GameRoomPid) ->
 %% @doc Sends a "win message" to all players and a message that the game has ended.
 %% @spec finish(Player, Playerlist) -> ok
 
-finish({_, WinnerAlias}, Players, Game, GameRoomPid) ->
+finish({_, WinnerAlias}, Players, GameRoomPid) ->
     print("The winner is "++WinnerAlias++"!\n", Players),
     GameRoomPid ! {finish, WinnerAlias},
     send({finish}, Players).
@@ -90,7 +90,7 @@ send(Output, [{Pid, _} | Players]) ->
 
 print(_, []) ->
     ok;
-print(Output, [{Pid,Alias} | Players]) ->
+print(Output, [{Pid, _} | Players]) ->
     Pid ! {output, Output},
     print(Output, Players).
 
@@ -98,10 +98,10 @@ print(Output, [{Pid,Alias} | Players]) ->
 %% @spec init() -> ok
 %% @spec getPlayer(Int, Playerlist) -> Player
 
-getPlayer(Int,[]) ->
+getPlayer(_, []) ->
     ok;
-getPlayer(Int,Players) ->
-    lists:nth(Int,Players).
+getPlayer(Int, Players) ->
+    lists:nth(Int, Players).
 
 
 

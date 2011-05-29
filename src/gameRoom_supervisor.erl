@@ -26,7 +26,7 @@ linkRooms([{GameModule, DisplayName, GamePid} | Tail], ResultingList, DbPid) ->
 	linkRooms(Tail, [{GameModule, DisplayName, GamePid} | ResultingList], DbPid).
 	
 
-%% @doc Traps exits and restarts any dying gameroom and updates the database with a new GameList for any restarted gameRoom.
+%% @doc Traps exits and restarts any dying gameroom and updates the database on DbPid with a new GameList for any restarted gameRoom.
 %% @spec trap(GameList, DbPid) -> ok 
 
 trap(GameList, DbPid) ->
