@@ -162,10 +162,3 @@ sendChallenge(Aliases, {OriginPid, OriginAlias}, GameRoomPid, PlayerList) ->
 			sendToClient(OriginPid, "ERROR: No such player available\n")
 	end.
 
-%	srv ! {getPid, Alias, self()},
-%   receive
-%	{returnPid, nomatch} ->
-%	    sendToClient(OriginPid, "ERROR: No such player available\n");
-%	{returnPid, Pid} ->
-%	    Pid ! {challenge, GameRoomPid, {OriginPid, OriginAlias}}
-%    end.
