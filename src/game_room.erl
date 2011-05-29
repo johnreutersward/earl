@@ -7,7 +7,7 @@
 %% @doc this module contains all the functions that is related to the game room.
 
 -module(game_room).
--export([init/2, handleInput/6, commandParser/6, sendChallenge/3, printPlayers/1, sendToClient/2]).
+-export([init/2, handleInput/6, commandParser/6, sendChallenge/4, printPlayers/1, sendToClient/2]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc initiates the game room
@@ -54,7 +54,7 @@ room(Game, GameName, PlayerList, HighScore) ->
 	    NewPlayerList = PlayerList;
 	{challenge, Aliases, Origin} ->
 	    srv ! {debug, "Challenging another player."},
-	    spawn(game_room, sendChallenge, [Aliases, Origin, self()]),
+	    spawn(game_room, sendChallenge, [Aliases, Origin, self(), PlayerList]),
 	    NewPlayerList = PlayerList,
 	    NewHighScore = HighScore;
 	{initiateGame, Players} ->
@@ -153,12 +153,19 @@ sendToClient(Pid, Message) ->
 %% @doc Sends a challenge to a specified client.
 %% @spec sendChallenge(Alias, Origin, GameRoomPid) -> ok
 
-sendChallenge(Aliases, {OriginPid, OriginAlias}, GameRoomPid) ->
-    Alias = hd(Aliases),
-    srv ! {getPid, Alias, self()},
-    receive
-	{returnPid, nomatch} ->
-	    sendToClient(OriginPid, "ERROR: No such player available\n");
-	{returnPid, Pid} ->
-	    Pid ! {challenge, GameRoomPid, {OriginPid, OriginAlias}}
-    end.
+sendChallenge(Aliases, {OriginPid, OriginAlias}, GameRoomPid, PlayerList) ->
+	Alias = hd(Aliases),
+	case lists:keyfind(Alias, 2, PlayerList) of
+		{Pid, _, _} ->
+		    Pid ! {challenge, GameRoomPid, {OriginPid, OriginAlias}};
+		false ->
+			sendToClient(OriginPid, "ERROR: No such player available\n")
+	end.
+
+%	srv ! {getPid, Alias, self()},
+%   receive
+%	{returnPid, nomatch} ->
+%	    sendToClient(OriginPid, "ERROR: No such player available\n");
+%	{returnPid, Pid} ->
+%	    Pid ! {challenge, GameRoomPid, {OriginPid, OriginAlias}}
+%    end.
