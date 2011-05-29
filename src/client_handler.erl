@@ -16,7 +16,7 @@
 %% @spec init(ClientPid) -> create_alias(ClientPid)
 
 init(ClientPid) ->
-    io:format("~n-- Welcome to Earl's Game Club!~n", []),
+    io:format("~n-- Welcome to Earl's Game Club! --~n", []),
     numConnected(),
     create_alias(ClientPid).
 
@@ -28,7 +28,6 @@ create_alias(ClientPid) ->
     io:format("Input a Username: ", []),
     Alias = getInput(),
     srv ! {checkAlias, Alias, self()},
-    io:format("Handler: Waiting for server confirmation~n", []),
     receive
 		{aliasValid} ->	
 	    srv ! {setStatus, self(), Alias, [main]},
