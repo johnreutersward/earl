@@ -2,7 +2,7 @@
 %% @author Andreas.Hammar.5781@student.uu.se
 %% @author Gabriella.Lundborg.6304@student.uu.se
 %% @author Emma.Rangert.2142@student.uu.se
-%% @author John.Reuterswärd.8971@student.uu.se
+%% @author John.Reutersward.8971@student.uu.se
 %% @author Simon.Young.0963@student.uu.se
 %% @doc This is the main server that handles all the communication between
 %% clients and clients to database the database.

@@ -2,7 +2,7 @@
 %% @author Andreas.Hammar.5781@student.uu.se
 %% @author Gabriella.Lundborg.6304@student.uu.se
 %% @author Emma.Rangert.2142@student.uu.se
-%% @author John.Reuterswärd.8971@student.uu.se
+%% @author John.Reutersward.8971@student.uu.se
 %% @author Simon.Young.0963@student.uu.se
 %% @doc This module has all the functions that the client needs on the server side.
 %% This functions gives the user all the information and ability to interact with other users
