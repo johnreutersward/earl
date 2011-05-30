@@ -83,7 +83,7 @@ getGame(GameModule) ->
 	end.
 
 %% @doc Returns a list of all the games. If this fails, an error message is returned. 
-%% @spec loadGameList() -> GameList | {error, Reason}
+%% @spec loadGamesList() -> GameList | {error, Reason}
 
 loadGamesList() ->
     case file:open("games.ini", read) of

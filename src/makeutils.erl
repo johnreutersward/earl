@@ -14,6 +14,5 @@ edoc:application(earliweb, ".", []),
 tester() -> 
 	client_handler:runtest(),
 	tictactoe:runtest(),
-	guessTheNumber:runtest(),
-	client:runtest(),
+	guess_the_number:runtest(),
 	init:stop().

@@ -8,7 +8,7 @@
 %% and speak to that server with client functions.
 
 -module(client).
--export([connect/0,wait/0, quit/0, runtest/0]).
+-export([connect/0,wait/0, quit/0]).
 -export([init/0]).
 
 -include_lib("eunit/include/eunit.hrl").
@@ -57,13 +57,3 @@ wait() ->
 quit() ->
     init:stop().
 
-%% TEST CASES %%
-%% @hidden
-
-init_test() ->
-	?assertEqual(node(), earl_game_club).
-
-runtest() ->
-	io:format("Now testing client~n"),
-    test(),
-    init:stop().

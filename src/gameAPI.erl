@@ -14,7 +14,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% @doc Starts a game instance for the players in the Playerlist.
-%% @spec init(Game, Playerlist) -> ok
+%% @spec init(Game, Players, GameRoomPid) -> ok
 
 init(Game, Players, GameRoomPid) ->
     lists:map( fun(X) -> erlang:monitor(process, element(1,X)) end, Players),
@@ -22,7 +22,7 @@ init(Game, Players, GameRoomPid) ->
     run(Game, State, Players, [], GameRoomPid).
 
 %% @doc Checks if the game is over and sends that information to all players or runs a new state of the game.
-%% @spec run(Game, State, Playerlist, Playerlist) -> ok
+%% @spec run(Game, State, Playerlist, Playerlist, GameRoomPid) -> ok
 
 run(Game, State, Players, [], GameRoomPid) ->
     run(Game, State, Players, Players, GameRoomPid);
@@ -38,7 +38,7 @@ run(Game, State, Players, [NextPlayer | RemainingPlayers], GameRoomPid) ->
     end.
 
 %% @doc Sends a "win message" to all players and a message that the game has ended.
-%% @spec finish(Player, Playerlist) -> ok
+%% @spec finish(Player, Playerlist, GameRoomPid) -> ok
 
 finish({_, WinnerAlias}, Players, GameRoomPid) ->
     print("The winner is "++WinnerAlias++"!\n", Players),
@@ -95,7 +95,6 @@ print(Output, [{Pid, _} | Players]) ->
     print(Output, Players).
 
 %% @doc Gets the nth player from the list.
-%% @spec init() -> ok
 %% @spec getPlayer(Int, Playerlist) -> Player
 
 getPlayer(_, []) ->

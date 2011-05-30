@@ -91,8 +91,6 @@ commandParser(RoomPid, [_ | Input], Origin, Alias, PlayerList, HighScore) ->
 	"players" ->
 	    AliasList = lists:sort([X || {_, X, _} <- PlayerList]),	
 	    Origin ! {printPlayers, AliasList};
-	"Nyan" ->
-	    8/0;
 	"high-score" ->
 	    Origin ! {printHighScore, HighScore};
 	_ ->
@@ -151,7 +149,7 @@ sendToClient(Pid, Message) ->
     Pid ! {message, "", Message}.
 
 %% @doc Sends a challenge to a specified client.
-%% @spec sendChallenge(Alias, Origin, GameRoomPid) -> ok
+%% @spec sendChallenge(Alias, Origin, GameRoomPid, PlayerList) -> ok
 
 sendChallenge(Aliases, {OriginPid, OriginAlias}, GameRoomPid, PlayerList) ->
 	Alias = hd(Aliases),

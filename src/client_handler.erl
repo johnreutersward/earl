@@ -65,7 +65,7 @@ main_menu(ClientPid, Alias) ->
     end.
 
 %% @doc Prints out the game menu for the user and enables the user to connect to a game room.
-%% @spec game_menu(Alias) -> ok.
+%% @spec game_menu(Alias) -> ok
 
 game_menu(Alias) ->
     db ! {getGamesList, self()},
@@ -210,10 +210,6 @@ getNumber() ->
 
 trim(String) ->
     string:strip(string:strip(String, both, $\n)).
-
-%% @doc sends {quit,self()} to the server.
-%% @spec quit(ClientPid) -> {quit}
-%% @hidden
 
 %% @doc prints the help information.
 %% @hidden
